@@ -5,8 +5,13 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 
 import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,5 +40,22 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    fun onButtonClick(view: View) {
+        println("on button x1 click")
+
+        NetworkService.getServerApi()
+            .getVersion()
+            .enqueue(object : Callback<String> {
+                override fun onResponse(call: Call<String>, response: Response<String>) {
+                    val body = response.body()
+                    println("success.body = $body")
+                }
+
+                override fun onFailure(call: Call<String>, t: Throwable) {
+                    error("failure.body = ${t.message}")
+                }
+            })
     }
 }
