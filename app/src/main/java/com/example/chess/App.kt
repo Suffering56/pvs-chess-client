@@ -1,7 +1,6 @@
-package com.example.chess.di
+package com.example.chess
 
 import android.app.Application
-import android.content.Context
 import com.example.chess.di.component.ApplicationComponent
 import com.example.chess.di.component.DaggerApplicationComponent
 import com.example.chess.di.module.ApplicationModule
@@ -13,6 +12,7 @@ import com.example.chess.di.module.ApplicationModule
 class App : Application() {
 
     lateinit var applicationComponent: ApplicationComponent
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -20,13 +20,10 @@ class App : Application() {
         applicationComponent = DaggerApplicationComponent.builder()
             .applicationModule(ApplicationModule(this))
             .build()
-
         applicationComponent.context = this
     }
+}
 
-    companion object {
-        fun get(context: Context): App {
-            return context.applicationContext as App
-        }
-    }
+fun printErr(msg: String) {
+    System.err.println(msg)
 }

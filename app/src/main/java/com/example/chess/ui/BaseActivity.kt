@@ -1,47 +1,34 @@
-package com.example.chess
+package com.example.chess.ui
 
-import android.content.Intent
+import android.app.Activity
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import com.example.chess.di.App
+import com.example.chess.App
+import com.example.chess.R
 import com.example.chess.di.component.ActivityComponent
 import com.example.chess.di.component.DaggerActivityComponent
 import com.example.chess.di.module.ActivityModule
-import com.example.chess.network.INetworkService
-import javax.inject.Inject
-
 
 /**
  * @author v.peschaniy
- *      Date: 18.07.2019
+ *      Date: 31.07.2019
  */
-class MainActivity : AppCompatActivity() {
+abstract class BaseActivity : Activity() {
 
-    @Inject
-    lateinit var networkService: INetworkService
-    private lateinit var activityComponent: ActivityComponent
+    protected lateinit var activityComponent: ActivityComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
+
         activityComponent = DaggerActivityComponent.builder()
             .activityModule(ActivityModule(this))
-            .applicationComponent(App.get(this).applicationComponent)
+            .applicationComponent((applicationContext as App).applicationComponent)
             .build()
-
-        activityComponent.inject(this)
-
-        println("networkService111 = ${networkService}")
     }
 
-    fun onButtonClick(view: View) {
-        Toast.makeText(this, "on button click: start", Toast.LENGTH_LONG).show()
 
-        val intent = Intent(this, ChessboardActivity::class.java)
-        startActivity(intent)
+
+
 //        println("networkService = ${networkService}")
 
 //        networkService.debugApi
@@ -60,9 +47,4 @@ class MainActivity : AppCompatActivity() {
 //                    t.printStackTrace()
 //                }
 //            })
-    }
-}
-
-fun printErr(msg: String) {
-    System.err.println(msg)
 }

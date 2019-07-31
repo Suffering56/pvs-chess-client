@@ -1,9 +1,9 @@
 package com.example.chess.di.component
 
-import com.example.chess.ChessboardActivity
-import com.example.chess.MainActivity
 import com.example.chess.di.ActivityScope
 import com.example.chess.di.module.ActivityModule
+import com.example.chess.ui.ChessboardActivity
+import com.example.chess.ui.MainActivity
 import dagger.Component
 
 /**
