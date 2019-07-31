@@ -1,0 +1,26 @@
+//AdapterView
+//button.text = resources.getString(R.string.app_name)
+//Toast.makeText(this, "on button click: start", Toast.LENGTH_LONG).show()
+//Log.i() Log.d()
+//@android:style/Theme.Dialog
+
+
+//// получаем Intent, который вызывал это Activity
+//Intent intent = getIntent();
+//// читаем из него action
+//String action = intent.getAction();
+// SET:  intent.putExtra("fname", etFName.getText().toString());
+// GET:  intent.getStringExtra("fname");
+
+//android.os.Handler
+//Существует еще пара способов выполнять Runnable в UI-потоке. Это методы:
+//Activity.runOnUiThread(Runnable)
+//View.post(Runnable)
+//View.postDelayed(Runnable, long)
+
+//Device File Explorer
+
+//I guess what you need is changing URL at runtime to a completely different one.
+//For instance, the following example will override the URL passed as baseUrl to retrofit object.
+//@GET
+//public Call<ResponseBody> profilePicture(@Url String url);

@@ -1,61 +1,68 @@
 package com.example.chess
 
+import android.content.Intent
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity;
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.chess.di.App
+import com.example.chess.di.component.ActivityComponent
+import com.example.chess.di.component.DaggerActivityComponent
+import com.example.chess.di.module.ActivityModule
+import com.example.chess.network.INetworkService
+import javax.inject.Inject
 
-import kotlinx.android.synthetic.main.activity_main.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-
+/**
+ * @author v.peschaniy
+ *      Date: 18.07.2019
+ */
 class MainActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var networkService: INetworkService
+    private lateinit var activityComponent: ActivityComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
-        setSupportActionBar(toolbar)
+        activityComponent = DaggerActivityComponent.builder()
+            .activityModule(ActivityModule(this))
+            .applicationComponent(App.get(this).applicationComponent)
+            .build()
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
-    }
+        activityComponent.inject(this)
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
+        println("networkService111 = ${networkService}")
     }
 
     fun onButtonClick(view: View) {
-        println("on button x1 click")
+        Toast.makeText(this, "on button click: start", Toast.LENGTH_LONG).show()
 
-        NetworkService.getServerApi()
-            .getVersion()
-            .enqueue(object : Callback<String> {
-                override fun onResponse(call: Call<String>, response: Response<String>) {
-                    val body = response.body()
-                    println("success.body = $body")
-                }
+        val intent = Intent(this, ChessboardActivity::class.java)
+        startActivity(intent)
+//        println("networkService = ${networkService}")
 
-                override fun onFailure(call: Call<String>, t: Throwable) {
-                    error("failure.body = ${t.message}")
-                }
-            })
+//        networkService.debugApi
+//            .getChessboard()
+//            .enqueue(object : Callback<ChessboardDTO> {     //TODO: выглядит так словно GUI замирает в ожидании респонса. возможно RxJava все же нужен, ну или Handler
+//                override fun onResponse(call: Call<ChessboardDTO>, response: Response<ChessboardDTO>) {
+//                    val chessboard = response.body()
+////                    chessboard?.matrix?.forEach {
+////                        it.forEach(::println)
+////                    }
+//                    println("success.body = $chessboard")
+//                }
+//
+//                override fun onFailure(call: Call<ChessboardDTO>, t: Throwable) {
+//                    printErr("failure.message = ${t.message}")
+//                    t.printStackTrace()
+//                }
+//            })
     }
+}
+
+fun printErr(msg: String) {
+    System.err.println(msg)
 }

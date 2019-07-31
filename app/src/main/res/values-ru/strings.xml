@@ -1,0 +1,4 @@
+<resources>
+    <string name="init_button_new_game">Новая игра</string>
+    <string name="chessboard_activity">ChessboardActivityRU</string>
+</resources>
