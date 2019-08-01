@@ -11,23 +11,18 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
 
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
 
             app:layout_constraintDimensionRatio="1:1"
-            android:id="@+id/chessboardView"/>
+            android:id="@+id/chessboardView"
+            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="8dp" android:layout_marginEnd="8dp" android:layout_marginBottom="8dp"/>
 
     <Button
             android:text="@string/download_chessboard_button"
-            android:layout_width="325dp"
-            android:layout_height="45dp"
-            android:id="@+id/downloadChessboardButton" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp"
+            android:layout_width="295dp"
+            android:layout_height="48dp"
+            android:id="@+id/downloadChessboardButton"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent" android:gravity="center" android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent"/>

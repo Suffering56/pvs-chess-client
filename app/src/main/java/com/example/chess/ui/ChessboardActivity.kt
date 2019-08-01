@@ -16,15 +16,37 @@ import javax.inject.Inject
 
 
 class ChessboardActivity : BaseActivity() {
+
+    companion object {
+        private const val CHESSBOARD_STATE = "CHESSBOARD_STATE"
+    }
+
     @Inject
     lateinit var networkService: INetworkService
+    private var chessboardState: ChessboardDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chessboard)
         activityComponent.inject(this)
-
         ButterKnife.bind(this)
+    }
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle?) {
+        super.onSaveInstanceState(savedInstanceState)
+        chessboardState?.let { savedInstanceState?.putSerializable(CHESSBOARD_STATE, it) }
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        chessboardState = savedInstanceState?.get(CHESSBOARD_STATE) as ChessboardDTO?
+        chessboardState?.let { chessboardView.update(it) }
+    }
+
+    @OnClick(R.id.rotateButton)
+    fun rotateChessboard() {
+        chessboardView.rotation += 180f
     }
 
     @OnClick(R.id.downloadChessboardButton)
@@ -32,21 +54,27 @@ class ChessboardActivity : BaseActivity() {
         println("downloadChessboard.start")
         Toast.makeText(this, "downloadChessboard", Toast.LENGTH_SHORT).show()
 
-        networkService.debugApi.getChessboard()     //TODO: долго отправляется запрос в первый раз - можно это вынести из ui потока
-            .enqueue(object : Callback<ChessboardDTO> {
-                override fun onResponse(call: Call<ChessboardDTO>, response: Response<ChessboardDTO>) {
-                    val chessboard = response.body()
-                    println("success.body = $chessboard")
+        Thread {
+            //TODO: RxKotlin mb?
+            networkService.debugApi.getChessboard()
+                .enqueue(object : Callback<ChessboardDTO> {
+                    override fun onResponse(call: Call<ChessboardDTO>, response: Response<ChessboardDTO>) {
+                        val chessboard = response.body()
+                        println("success.body = $chessboard")
+                        requireNotNull(chessboard)
+                        this@ChessboardActivity.chessboardState = chessboard
 
-                    requireNotNull(chessboard)
-                    chessboardView.update(chessboard)
-                }
+                        this@ChessboardActivity.runOnUiThread {
+                            chessboardView.update(chessboard)
+                        }
+                    }
 
-                override fun onFailure(call: Call<ChessboardDTO>, t: Throwable) {
-                    printErr("failure.message = ${t.message}")
-                    t.printStackTrace()
-                }
-            })
+                    override fun onFailure(call: Call<ChessboardDTO>, t: Throwable) {
+                        printErr("failure.message = ${t.message}")
+                        t.printStackTrace()
+                    }
+                })
+        }.start()
 
         println("downloadChessboard.end")
     }

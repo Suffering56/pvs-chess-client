@@ -25,7 +25,9 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
 
-    private val cellImagesMatrix: Array<Array<ImageView>>
+    lateinit var getAvailableMovesListener: (rowIndex: Int, columnIndex: Int) -> Set<PointDTO>
+
+    private val cellImagesMatrix: Array<Array<CellContainer>>
 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_view, this, true)
@@ -39,24 +41,35 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                 img.setOnClickListener { onCellClick(rowIndex, columnIndex) }
                 tableRow.addView(img)
 
-                return@cell img
+                return@cell CellContainer(rowIndex, columnIndex, img)
             }
             chessboardTable.addView(tableRow)
 
             return@row imagesArray
         }
+
+        rotation = 180f //представление по умолчанию: игрок играет белыми (поэтому они должны быть снизу)
     }
 
     fun update(dto: ChessboardDTO) {
-        dto.matrix.forEach { row ->
-            row.forEach {
-                val img = getCellImage(it.pointDTO)
-                img.setImageResource(convertPieceToResource(it.piece))
-            }
+        forEachCell {
+            val piece = dto.matrix[it.rowIndex][it.columnIndex].piece
+            it.img.setImageResource(convertPieceToResource(piece))
         }
     }
 
-    private fun getCellImage(point: PointDTO): ImageView {
+    private fun forEachCell(eachConsumer: (cell: CellContainer) -> Unit) {
+        cellImagesMatrix.forEach {
+            it.forEach(eachConsumer)
+        }
+    }
+
+    override fun setRotation(rotation: Float) {
+        super.setRotation(rotation)
+        forEachCell { it.img.rotation = rotation }
+    }
+
+    private fun getCell(point: PointDTO): CellContainer {
         return cellImagesMatrix[point.rowIndex][point.columnIndex]
     }
 
@@ -69,22 +82,21 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             Arrays.stream(cellImagesMatrix)
                 .flatMap { Arrays.stream(it) }
                 .forEach {
-                    it.layoutParams.width = cellSize
-                    it.layoutParams.height = cellSize
-                    it.requestLayout()
+                    it.img.layoutParams.width = cellSize
+                    it.img.layoutParams.height = cellSize
+                    it.img.requestLayout()
                 }
         }
-    }
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        //init butterknife если нужно
     }
 
     private fun onCellClick(rowIndex: Int, columnIndex: Int) {
         println("rowIndex = $rowIndex")
         println("rowIndex = $columnIndex")
-        cellImagesMatrix[rowIndex][columnIndex].setImageResource(R.color.colorLightTransparency)
+        cellImagesMatrix[rowIndex][columnIndex].img.setImageResource(R.color.colorLightTransparency)
+
+        if (::getAvailableMovesListener.isInitialized) {
+            val availablePoints = getAvailableMovesListener.invoke(rowIndex, columnIndex)
+        }
     }
 
     private fun convertPieceToResource(piece: Piece?): Int {
@@ -103,5 +115,17 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             Piece.KING_BLACK -> R.drawable.king_black
             null -> PIECE_NONE
         }
+    }
+
+    private class CellContainer(
+        val rowIndex: Int,
+        val columnIndex: Int,
+        val img: ImageView
+    ) {
+        var selected = false        //повторный клик убирает выделение и снимает доступные ходы
+        var available = false       //available-empty + available-harmful
+        //mouseOver -> only for available
+        //opponentPrevMove.from-> to
+        //checked
     }
 }
