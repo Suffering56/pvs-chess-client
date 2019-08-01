@@ -16,12 +16,11 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         activityComponent.inject(this)
-
         ButterKnife.bind(this)
     }
 
     @OnClick(R.id.newGameButton)
-    fun onButtonClick() {
+    fun showChessboard() {
         val intent = Intent(this, ChessboardActivity::class.java)
         startActivity(intent)
     }

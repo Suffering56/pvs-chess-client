@@ -2,5 +2,5 @@
     <string name="app_name" translatable="false">pvs-chess-client</string>
     <string name="action_settings" translatable="false">Settings</string>
     <string name="init_button_new_game">New game</string>
-    <string name="chessboard_activity">ChessboardActivity</string>
+    <string name="download_chessboard_button" translatable="false">Download Chessboard</string>
 </resources>

@@ -7,12 +7,28 @@
         android:layout_height="match_parent"
         tools:context=".ui.ChessboardActivity">
 
-    <TextView
-            android:text="@string/chessboard_activity"
-            android:layout_width="139dp"
+    <com.example.chess.ui.ChessboardView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+
+            app:layout_constraintDimensionRatio="1:1"
+            android:id="@+id/chessboardView"/>
+
+    <Button
+            android:text="@string/download_chessboard_button"
+            android:layout_width="325dp"
             android:layout_height="45dp"
-            android:id="@+id/textView" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"
-            app:layout_constraintTop_toTopOf="parent" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent" android:gravity="center"/>
+            android:id="@+id/downloadChessboardButton" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent" android:gravity="center" android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

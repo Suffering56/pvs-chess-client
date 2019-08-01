@@ -25,26 +25,4 @@ abstract class BaseActivity : Activity() {
             .applicationComponent((applicationContext as App).applicationComponent)
             .build()
     }
-
-
-
-
-//        println("networkService = ${networkService}")
-
-//        networkService.debugApi
-//            .getChessboard()
-//            .enqueue(object : Callback<ChessboardDTO> {     //TODO: выглядит так словно GUI замирает в ожидании респонса. возможно RxJava все же нужен, ну или Handler
-//                override fun onResponse(call: Call<ChessboardDTO>, response: Response<ChessboardDTO>) {
-//                    val chessboard = response.body()
-////                    chessboard?.matrix?.forEach {
-////                        it.forEach(::println)
-////                    }
-//                    println("success.body = $chessboard")
-//                }
-//
-//                override fun onFailure(call: Call<ChessboardDTO>, t: Throwable) {
-//                    printErr("failure.message = ${t.message}")
-//                    t.printStackTrace()
-//                }
-//            })
 }
