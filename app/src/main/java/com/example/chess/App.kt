@@ -24,6 +24,14 @@ class App : Application() {
     }
 }
 
-fun printErr(msg: String) {
+fun printErr(msg: String, e: Throwable? = null) {
     System.err.println(msg)
+    e?.printStackTrace()
 }
+
+fun printErr(e: Throwable) {
+    printErr("failure.message = ${e.message}", e)
+}
+
+
+

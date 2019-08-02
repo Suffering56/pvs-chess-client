@@ -3,6 +3,11 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
     <color name="colorAbsoluteTransparency">#00000000</color>
     <color name="colorLightTransparency">#1A000000</color>
+
+    <color name="chessboardCellSelected">#A63D5A1D</color>
+    <color name="chessboardCellPrevious">#66978700</color>
+
 </resources>

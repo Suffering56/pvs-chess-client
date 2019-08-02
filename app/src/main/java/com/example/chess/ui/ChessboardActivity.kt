@@ -23,25 +23,43 @@ class ChessboardActivity : BaseActivity() {
 
     @Inject
     lateinit var networkService: INetworkService
-    private var chessboardState: ChessboardDTO? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chessboard)
         activityComponent.inject(this)
         ButterKnife.bind(this)
+
+        Thread {
+            networkService.debugApi.getChessboard()
+                .enqueue(object : Callback<ChessboardDTO> {
+                    override fun onResponse(call: Call<ChessboardDTO>, response: Response<ChessboardDTO>) {
+                        response.body()?.let {
+                            this@ChessboardActivity.runOnUiThread {
+                                if (!chessboardView.isInitialized()) {
+                                    chessboardView.init(it)
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: Call<ChessboardDTO>, e: Throwable) {
+                        printErr(e)
+                    }
+                })
+        }.start()   //TODO: RxKotlin mb?
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle?) {
         super.onSaveInstanceState(savedInstanceState)
-        chessboardState?.let { savedInstanceState?.putSerializable(CHESSBOARD_STATE, it) }
+        chessboardView.getState()?.let { savedInstanceState?.putSerializable(CHESSBOARD_STATE, it) }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        chessboardState = savedInstanceState?.get(CHESSBOARD_STATE) as ChessboardDTO?
-        chessboardState?.let { chessboardView.update(it) }
+        val chessboardState = savedInstanceState?.get(CHESSBOARD_STATE) as ChessboardView.State?
+        chessboardState?.let { chessboardView.init(it) }
     }
 
     @OnClick(R.id.rotateButton)
@@ -53,29 +71,6 @@ class ChessboardActivity : BaseActivity() {
     fun downloadChessboard() {
         println("downloadChessboard.start")
         Toast.makeText(this, "downloadChessboard", Toast.LENGTH_SHORT).show()
-
-        Thread {
-            //TODO: RxKotlin mb?
-            networkService.debugApi.getChessboard()
-                .enqueue(object : Callback<ChessboardDTO> {
-                    override fun onResponse(call: Call<ChessboardDTO>, response: Response<ChessboardDTO>) {
-                        val chessboard = response.body()
-                        println("success.body = $chessboard")
-                        requireNotNull(chessboard)
-                        this@ChessboardActivity.chessboardState = chessboard
-
-                        this@ChessboardActivity.runOnUiThread {
-                            chessboardView.update(chessboard)
-                        }
-                    }
-
-                    override fun onFailure(call: Call<ChessboardDTO>, t: Throwable) {
-                        printErr("failure.message = ${t.message}")
-                        t.printStackTrace()
-                    }
-                })
-        }.start()
-
         println("downloadChessboard.end")
     }
 }
