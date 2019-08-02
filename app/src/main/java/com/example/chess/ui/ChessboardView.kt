@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.chess.R
 import com.example.chess.shared.dto.*
 import com.example.chess.shared.enums.Piece
+import com.example.chess.shared.enums.Side
 import kotlinx.android.synthetic.main.chessboard_view.view.*
 import java.io.Serializable
 import java.util.*
@@ -59,14 +60,14 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
             return@row imagesArray
         }
-
-        rotation = 180f //представление по умолчанию: игрок играет белыми (поэтому они должны быть снизу)
     }
 
     fun init(chessboard: ChessboardDTO) {
         check(!isInitialized())
 
         this.state = State(chessboard)
+        setSide(Side.WHITE)
+
         updateViewByState(true)
     }
 
@@ -74,6 +75,8 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         check(!isInitialized())
 
         this.state = state
+        setSide(Side.WHITE)
+
         updateViewByState(true)
     }
 
@@ -104,6 +107,15 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
 
         chessboardProgressBar.visibility = View.INVISIBLE
+    }
+
+    fun setSide(side: Side) {
+        state.side = side
+
+        rotation = when (side) {
+            Side.WHITE -> 180f
+            Side.BLACK -> 0f
+        }
     }
 
     override fun setRotation(rotation: Float) {
@@ -144,7 +156,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         if (state.isAvailablePoint(selectedPoint)) {
             state.cleanHighlighting()            //TODO: replace with applyMove
 
-        } else if (selectedCell.piece == null || selectedPoint == state.selectedPoint) {
+        } else if (selectedCell.piece?.side != state.side || selectedPoint == state.selectedPoint) {
             state.cleanHighlighting()
 
         } else {
@@ -227,7 +239,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     }
 
     class State(chessboard: ChessboardDTO? = null) : Serializable {
-
         lateinit var chessboard: ChessboardDTO
 
         init {
@@ -235,6 +246,8 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
 
         var position = 0
+        var side: Side = Side.WHITE
+
         var selectedPoint: PointDTO? = null
         var availablePoints: Set<PointDTO>? = null
         var previousMove: MoveDTO? = null

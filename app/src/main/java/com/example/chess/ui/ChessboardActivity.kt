@@ -64,7 +64,7 @@ class ChessboardActivity : BaseActivity() {
 
     @OnClick(R.id.rotateButton)
     fun rotateChessboard() {
-        chessboardView.rotation += 180f
+        chessboardView.setSide(chessboardView.getState()!!.side.reverse())
     }
 
     @OnClick(R.id.downloadChessboardButton)

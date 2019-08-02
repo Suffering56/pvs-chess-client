@@ -1,3 +1,10 @@
+- debug panel: {
+    - checkbox: autoWakeUp
+    - button: wake
+}
+
+//https://jsonplaceholder.typicode.com/
+
 //AdapterView
 //button.text = resources.getString(R.string.app_name)
 //Toast.makeText(this, "on button click: start", Toast.LENGTH_LONG).show()
