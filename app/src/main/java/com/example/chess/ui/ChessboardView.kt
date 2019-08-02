@@ -32,11 +32,10 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     private lateinit var state: State
     fun isInitialized() = ::state.isInitialized
-
-    fun getState() = if (isInitialized()) state else null
+    fun getState() = if (isInitialized()) state else null   //TODO: IUnmodifiableState
 
     var getAvailableMovesListener: ((rowIndex: Int, columnIndex: Int) -> Set<PointDTO>)? = null
-
+    var applyMoveListener: ((move: MoveDTO) -> ChangesDTO)? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_view, this, true)
@@ -50,7 +49,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
                 img.setImageResource(TRANSPARENT)
                 img.setOnClickListener { onCellClick(rowIndex, columnIndex) }
-//                img.setOnHoverListener()
 
                 tableRow.addView(img)
 
@@ -68,7 +66,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         this.state = State(chessboard)
         setSide(Side.WHITE)
 
-        updateViewByState(true)
+        updateViewByState()
     }
 
     fun init(state: State) {
@@ -77,14 +75,12 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         this.state = state
         setSide(Side.WHITE)
 
-        updateViewByState(true)
+        updateViewByState()
     }
 
-    private fun updateViewByState(withPieces: Boolean = false) {
-        if (withPieces) {
-            cellsStream.forEach {
-                it.piece = state.chessboard.matrix[it.rowIndex][it.columnIndex].piece
-            }
+    private fun updateViewByState() {
+        cellsStream.forEach {
+            it.piece = state.chessboard.matrix[it.rowIndex][it.columnIndex].piece
         }
 
         cellsStream.forEach { it.unmark() }
@@ -154,31 +150,23 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         val selectedPoint = selectedCell.point
 
         if (state.isAvailablePoint(selectedPoint)) {
-            state.cleanHighlighting()            //TODO: replace with applyMove
+            val move = MoveDTO(state.selectedPoint!!, selectedPoint)
 
-        } else if (selectedCell.piece?.side != state.side || selectedPoint == state.selectedPoint) {
+            val changes = applyMoveListener?.invoke(move)
+                ?: ChangesDTO(1, move, PointDTO(7, 3))
+
+            state.applyChanges(changes)
+
+        } else if (selectedPoint == state.selectedPoint || !state.isSelfPiece(selectedCell.piece) || !state.isSelfTurn()) {
             state.cleanHighlighting()
 
         } else {
-            state.availablePoints = getAvailableMovesListener?.invoke(rowIndex, columnIndex) ?: setOf(
-                PointDTO(0, 0),
-                PointDTO(4, 3),
-                PointDTO(4, 4),
-                PointDTO(4, 5),
-                PointDTO(4, 6),
-                PointDTO(5, 2)
-            )
-
+            state.availablePoints = getAvailableMovesListener?.invoke(rowIndex, columnIndex)
             state.selectedPoint = selectedPoint
-
-            //TODO: stub
-            state.checkedPoint = PointDTO(7, 3)
-            state.previousMove = MoveDTO(PointDTO(6, 0), PointDTO(4, 0))
         }
 
         updateViewByState()
     }
-
 
     private class CellImageWrapper(
         val rowIndex: Int,
@@ -289,5 +277,11 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
 
         internal fun isAvailablePoint(point: PointDTO) = availablePoints?.contains(point) ?: false
+
+        internal fun isSelfPiece(selectedPiece: Piece?) = selectedPiece?.side == side
+
+        internal fun isSelfTurn() = nextTurnSide() == side
+
+        private fun nextTurnSide() = if (position % 2 == 0) Side.WHITE else Side.BLACK
     }
 }
