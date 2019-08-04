@@ -58,6 +58,7 @@ dependencies {
     implementation group: 'com.squareup.retrofit2', name: 'converter-jackson', version: '2.6.0'
     implementation group: 'com.squareup.retrofit2', name: 'converter-scalars', version: '2.6.0'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.6.0'
 
     //di - dagger
     implementation 'com.google.dagger:dagger-android:2.23.2'

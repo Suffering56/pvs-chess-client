@@ -11,6 +11,7 @@ import com.example.chess.R
 import com.example.chess.shared.dto.*
 import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
+import com.example.chess.utils.changeSize
 import kotlinx.android.synthetic.main.chessboard_view.view.*
 import java.io.Serializable
 import java.util.*
@@ -129,17 +130,11 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         val cellSize = w / BOARD_SIZE
 
         this.post {
-            chessboardProgressBar.layoutParams.width = cellSize * 2
-            chessboardProgressBar.layoutParams.height = cellSize * 2
-            chessboardProgressBar.requestLayout()
+            chessboardProgressBar.changeSize(cellSize * 2)
 
             Arrays.stream(cellsMatrices)
                 .flatMap { Arrays.stream(it) }
-                .forEach {
-                    it.img.layoutParams.width = cellSize
-                    it.img.layoutParams.height = cellSize
-                    it.img.requestLayout()
-                }
+                .forEach { it.img.changeSize(cellSize) }
         }
     }
 
@@ -245,7 +240,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             this.chessboard = chessboard
 
             position = chessboard.position
-            previousMove = chessboard.prevoiusMove
+            previousMove = chessboard.previousMove
             checkedPoint = chessboard.checkedPoint
 
             cleanHighlighting()

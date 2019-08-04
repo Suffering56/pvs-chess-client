@@ -18,7 +18,7 @@ abstract class BaseActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.main_activity)
 
         activityComponent = DaggerActivityComponent.builder()
             .activityModule(ActivityModule(this))

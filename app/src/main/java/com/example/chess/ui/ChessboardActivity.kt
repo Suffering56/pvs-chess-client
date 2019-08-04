@@ -1,20 +1,16 @@
 package com.example.chess.ui
 
 import android.os.Bundle
-import android.widget.Toast
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.example.chess.R
 import com.example.chess.network.INetworkService
-import com.example.chess.printErr
 import com.example.chess.shared.dto.ChangesDTO
-import com.example.chess.shared.dto.ChessboardDTO
+import com.example.chess.shared.dto.GameDTO
 import com.example.chess.shared.dto.MoveDTO
 import com.example.chess.shared.dto.PointDTO
-import kotlinx.android.synthetic.main.activity_chessboard.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.chess.utils.enqueue
+import kotlinx.android.synthetic.main.chessboard_activity.*
 import javax.inject.Inject
 
 
@@ -44,32 +40,26 @@ class ChessboardActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chessboard)
+        setContentView(R.layout.chessboard_activity)
         activityComponent.inject(this)
         ButterKnife.bind(this)
 
         chessboardView.getAvailableMovesListener = getAvailableMovesListener
         chessboardView.applyMoveListener = applyMoveListener
 
+        val game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
+        println("GAME = $game")
+
         Thread {
             networkService.debugApi.getChessboard()
-                .enqueue(object : Callback<ChessboardDTO> {
-                    override fun onResponse(call: Call<ChessboardDTO>, response: Response<ChessboardDTO>) {
-
-                        response.body()?.let {
-                            this@ChessboardActivity.runOnUiThread {
-                                if (!chessboardView.isInitialized()) {
-                                    chessboardView.init(it)
-                                }
-                            }
+                .enqueue { response ->
+                    response.body()?.let {
+                        if (!chessboardView.isInitialized()) {
+                            chessboardView.init(it)
                         }
                     }
-
-                    override fun onFailure(call: Call<ChessboardDTO>, e: Throwable) {
-                        printErr(e)
-                    }
-                })
-        }.start()   //TODO: RxKotlin mb?
+                }
+        }.start()   //first service call is too long
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle?) {
@@ -87,12 +77,5 @@ class ChessboardActivity : BaseActivity() {
     @OnClick(R.id.rotateButton)
     fun rotateChessboard() {
         chessboardView.setSide(chessboardView.getState()!!.side.reverse())
-    }
-
-    @OnClick(R.id.downloadChessboardButton)
-    fun downloadChessboard() {
-        println("downloadChessboard.start")
-        Toast.makeText(this, "downloadChessboard", Toast.LENGTH_SHORT).show()
-        println("downloadChessboard.end")
     }
 }
