@@ -13,7 +13,6 @@ import butterknife.OnTextChanged
 import com.example.chess.R
 import com.example.chess.network.INetworkService
 import com.example.chess.shared.dto.GameDTO
-import com.example.chess.shared.enums.ExtendedSide
 import com.example.chess.shared.enums.GameMode
 import com.example.chess.shared.enums.Side
 import com.example.chess.utils.enqueue
@@ -29,7 +28,7 @@ class MainActivity : BaseActivity() {
 
     companion object {
         const val GAME = "game"
-        const val EXTENDED_SIDE = "side"
+        const val SIDE = "side"
     }
 
     @Inject
@@ -128,9 +127,16 @@ class MainActivity : BaseActivity() {
             if (game.mode == GameMode.UNSELECTED) {
                 showModeLayout()
             } else {
-                when (game.side) {
-                    ExtendedSide.UNSELECTED -> showSideLayout()
-                    else -> showChessboardActivity(game.side)
+                val side = game.side
+
+                if (side == null) {
+                    if (game.freeSideSlots.isNotEmpty()) {
+                        showSideLayout()
+                    } else {
+                        showChessboardActivity(null)    //isViewer
+                    }
+                } else {
+                    showChessboardActivity(side)
                 }
             }
         }
@@ -151,16 +157,26 @@ class MainActivity : BaseActivity() {
     }
 
     private fun showSideLayout() {
+        whiteSideButton.isEnabled = false
+        blackSideButton.isEnabled = false
+
+        game.freeSideSlots.forEach {
+            when (it) {
+                Side.WHITE -> whiteSideButton.isEnabled = true
+                Side.BLACK -> blackSideButton.isEnabled = true
+            }
+        }
+
         mainLayout.visibility = View.INVISIBLE
         chooseModeLayout.visibility = View.INVISIBLE
 
         chooseSideLayout.visibility = View.VISIBLE
     }
 
-    private fun showChessboardActivity(side: ExtendedSide) {
+    private fun showChessboardActivity(side: Side?) {
         val intent = Intent(this, ChessboardActivity::class.java)
         intent.putExtra(GAME, game)
-        intent.putExtra(EXTENDED_SIDE, side)
+        intent.putExtra(SIDE, side)
         startActivity(intent)
     }
 

@@ -9,7 +9,6 @@ import android.widget.TableRow
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.chess.R
 import com.example.chess.shared.dto.*
-import com.example.chess.shared.enums.ExtendedSide
 import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
 import com.example.chess.utils.changeSize
@@ -62,7 +61,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
     }
 
-    fun init(chessboard: ChessboardDTO, side: ExtendedSide) {
+    fun init(chessboard: ChessboardDTO, side: Side?) {
         check(!isInitialized())
 
         this.state = State(chessboard)
@@ -107,12 +106,12 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         chessboardProgressBar.visibility = View.INVISIBLE
     }
 
-    fun setSide(side: ExtendedSide) {
+    fun setSide(side: Side?) {
         state.side = side
 
         rotation = when (side) {
-            ExtendedSide.SIDE_WHITE -> 180f
-            ExtendedSide.SIDE_BLACK -> 0f
+            Side.WHITE -> 180f
+            Side.BLACK -> 0f
             else -> 180f
         }
     }
@@ -231,7 +230,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
 
         var position = 0
-        var side: ExtendedSide = ExtendedSide.VIEWER
+        var side: Side? = null  //if side == null -> isViewer
 
         var selectedPoint: PointDTO? = null
         var availablePoints: Set<PointDTO>? = null
@@ -275,9 +274,9 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
         internal fun isAvailablePoint(point: PointDTO) = availablePoints?.contains(point) ?: false
 
-        internal fun isSelfPiece(selectedPiece: Piece?) = side.isNormal() && selectedPiece?.side == side.toSide()
+        internal fun isSelfPiece(selectedPiece: Piece?) = side == selectedPiece?.side
 
-        internal fun isSelfTurn() = side.isNormal() && nextTurnSide() == side.toSide()
+        internal fun isSelfTurn() = side == nextTurnSide()
 
         private fun nextTurnSide() = if (position % 2 == 0) Side.WHITE else Side.BLACK
     }
