@@ -3,6 +3,10 @@
     - button: wake
 }
 
+- можно перетащить VIEWER в GameMode и избавиться от ExtendedSide
+
+
+
 //https://jsonplaceholder.typicode.com/
 
 //AdapterView

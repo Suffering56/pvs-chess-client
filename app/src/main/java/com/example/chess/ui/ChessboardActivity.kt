@@ -9,6 +9,7 @@ import com.example.chess.shared.dto.ChangesDTO
 import com.example.chess.shared.dto.GameDTO
 import com.example.chess.shared.dto.MoveDTO
 import com.example.chess.shared.dto.PointDTO
+import com.example.chess.shared.enums.ExtendedSide
 import com.example.chess.utils.enqueue
 import kotlinx.android.synthetic.main.chessboard_activity.*
 import javax.inject.Inject
@@ -48,14 +49,14 @@ class ChessboardActivity : BaseActivity() {
         chessboardView.applyMoveListener = applyMoveListener
 
         val game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
-        println("GAME = $game")
+        val side = intent.getSerializableExtra(MainActivity.EXTENDED_SIDE) as ExtendedSide
 
         Thread {
             networkService.debugApi.getChessboard()
                 .enqueue { response ->
                     response.body()?.let {
                         if (!chessboardView.isInitialized()) {
-                            chessboardView.init(it)
+                            chessboardView.init(it, side)
                         }
                     }
                 }
@@ -76,6 +77,7 @@ class ChessboardActivity : BaseActivity() {
 
     @OnClick(R.id.rotateButton)
     fun rotateChessboard() {
-        chessboardView.setSide(chessboardView.getState()!!.side.reverse())
+//        chessboardView.setSide(chessboardView.getState()!!.side.reverse())
+        chessboardView.rotation += 180f
     }
 }

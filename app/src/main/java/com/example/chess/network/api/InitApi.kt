@@ -1,9 +1,12 @@
 package com.example.chess.network.api
 
 import com.example.chess.shared.dto.GameDTO
+import com.example.chess.shared.enums.GameMode
+import com.example.chess.shared.enums.Side
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 /**
  * @author v.peschaniy
@@ -11,12 +14,23 @@ import retrofit2.http.Path
  */
 interface InitApi {
 
-    @GET("init")
+    @GET("init/new")
     fun createGame(): Call<GameDTO>
 
-    @GET("init/{gameId}")
-    fun getGame(@Path("gameId") gameId: Long): Call<GameDTO>
+    @GET("init/continue")
+    fun getGame(@Query("userId") userId: String, @Query("gameId") gameId: Long): Call<GameDTO>
 
-//    @GET("init/chessboard")
-//    fun getChessboard(): Call<ChessboardDTO>
+    @POST("init/mode")
+    fun setGameMode(
+        @Query("userId") userId: String,
+        @Query("gameId") gameId: Long,
+        @Query("mode") mode: GameMode
+    ): Call<GameDTO>
+
+    @POST("init/side")
+    fun setSide(
+        @Query("userId") userId: String,
+        @Query("gameId") gameId: Long,
+        @Query("side") side: Side
+    ): Call<GameDTO>
 }

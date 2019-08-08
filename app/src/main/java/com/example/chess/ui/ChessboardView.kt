@@ -9,6 +9,7 @@ import android.widget.TableRow
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.example.chess.R
 import com.example.chess.shared.dto.*
+import com.example.chess.shared.enums.ExtendedSide
 import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
 import com.example.chess.utils.changeSize
@@ -61,11 +62,11 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
     }
 
-    fun init(chessboard: ChessboardDTO) {
+    fun init(chessboard: ChessboardDTO, side: ExtendedSide) {
         check(!isInitialized())
 
         this.state = State(chessboard)
-        setSide(Side.WHITE)
+        setSide(side)
 
         updateViewByState()
     }
@@ -74,7 +75,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         check(!isInitialized())
 
         this.state = state
-        setSide(Side.WHITE)
+        setSide(state.side)
 
         updateViewByState()
     }
@@ -106,12 +107,13 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         chessboardProgressBar.visibility = View.INVISIBLE
     }
 
-    fun setSide(side: Side) {
+    fun setSide(side: ExtendedSide) {
         state.side = side
 
         rotation = when (side) {
-            Side.WHITE -> 180f
-            Side.BLACK -> 0f
+            ExtendedSide.SIDE_WHITE -> 180f
+            ExtendedSide.SIDE_BLACK -> 0f
+            else -> 180f
         }
     }
 
@@ -229,7 +231,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
 
         var position = 0
-        var side: Side = Side.WHITE
+        var side: ExtendedSide = ExtendedSide.VIEWER
 
         var selectedPoint: PointDTO? = null
         var availablePoints: Set<PointDTO>? = null
@@ -273,9 +275,9 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
         internal fun isAvailablePoint(point: PointDTO) = availablePoints?.contains(point) ?: false
 
-        internal fun isSelfPiece(selectedPiece: Piece?) = selectedPiece?.side == side
+        internal fun isSelfPiece(selectedPiece: Piece?) = side.isNormal() && selectedPiece?.side == side.toSide()
 
-        internal fun isSelfTurn() = nextTurnSide() == side
+        internal fun isSelfTurn() = side.isNormal() && nextTurnSide() == side.toSide()
 
         private fun nextTurnSide() = if (position % 2 == 0) Side.WHITE else Side.BLACK
     }

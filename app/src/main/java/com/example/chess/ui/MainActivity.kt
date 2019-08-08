@@ -12,6 +12,10 @@ import butterknife.OnClick
 import butterknife.OnTextChanged
 import com.example.chess.R
 import com.example.chess.network.INetworkService
+import com.example.chess.shared.dto.GameDTO
+import com.example.chess.shared.enums.ExtendedSide
+import com.example.chess.shared.enums.GameMode
+import com.example.chess.shared.enums.Side
 import com.example.chess.utils.enqueue
 import com.example.chess.utils.getTextAsLong
 import kotlinx.android.synthetic.main.main_activity.*
@@ -24,11 +28,14 @@ import javax.inject.Inject
 class MainActivity : BaseActivity() {
 
     companion object {
-        const val GAME = "gameId"
+        const val GAME = "game"
+        const val EXTENDED_SIDE = "side"
     }
 
     @Inject
     lateinit var networkService: INetworkService
+
+    private lateinit var game: GameDTO
 
     @SuppressLint("HardwareIds")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,7 +44,15 @@ class MainActivity : BaseActivity() {
         activityComponent.inject(this)
         ButterKnife.bind(this)
 
-        val playerId = getString(applicationContext.contentResolver, Settings.Secure.ANDROID_ID)
+        showNextStep()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        showMainLayout()
+        if (::game.isInitialized) {
+            continueGameIdText.setText(game.id.toString())
+        }
     }
 
     @OnClick(R.id.newGameButton)
@@ -48,12 +63,8 @@ class MainActivity : BaseActivity() {
             networkService.initApi.createGame()
                 .enqueue {
                     progressBar.visibility = View.INVISIBLE
-
-                    val game = it.body()!!
-
-                    val intent = Intent(this@MainActivity, ChessboardActivity::class.java)
-                    intent.putExtra(GAME, game)
-                    startActivity(intent)
+                    game = it.body()!!
+                    showNextStep()
                 }
         }.start()    //first service call is too long
     }
@@ -61,24 +72,101 @@ class MainActivity : BaseActivity() {
     @OnClick(R.id.continueGameButton)
     fun continueGame() {
         progressBar.visibility = View.VISIBLE
+
         Thread {
-            networkService.initApi.getGame(continueGameIdText.getTextAsLong())
+            networkService.initApi.getGame(userId, continueGameIdText.getTextAsLong())
                 .enqueue {
                     progressBar.visibility = View.INVISIBLE
-
-                    val intent = Intent(this@MainActivity, ChessboardActivity::class.java)
-                    intent.putExtra(GAME, it.body()!!)
-                    startActivity(intent)
+                    game = it.body()!!
+                    showNextStep()
                 }
         }.start()   //first service call is too long
+    }
+
+    @OnClick(value = [R.id.singleModeButton, R.id.pvpModeButton, R.id.aiModeButton])
+    fun selectGameModeClick(view: View) {
+
+        val gameMode = when (view.id) {
+            R.id.singleModeButton -> GameMode.SINGLE
+            R.id.pvpModeButton -> GameMode.PVP
+            R.id.aiModeButton -> GameMode.AI
+            else -> throw UnsupportedOperationException()
+        }
+
+        networkService.initApi.setGameMode(userId, game.id, gameMode)
+            .enqueue {
+                game = it.body()!!
+                showNextStep()
+            }
+    }
+
+    @OnClick(value = [R.id.whiteSideButton, R.id.blackSideButton])
+    fun selectSideButton(view: View) {
+
+        val side = when (view.id) {
+            R.id.whiteSideButton -> Side.WHITE
+            R.id.blackSideButton -> Side.BLACK
+            else -> throw UnsupportedOperationException()
+        }
+
+        networkService.initApi.setSide(userId, game.id, side)
+            .enqueue {
+                game = it.body()!!
+                showNextStep()
+            }
     }
 
     @OnTextChanged(R.id.continueGameIdText)
     fun onGameIdChanged(actualText: CharSequence) {
         continueGameButton.isEnabled = actualText.isNotEmpty()
     }
+
+    private fun showNextStep() {
+        if (!::game.isInitialized) {
+            showMainLayout()
+        } else {
+            if (game.mode == GameMode.UNSELECTED) {
+                showModeLayout()
+            } else {
+                when (game.side) {
+                    ExtendedSide.UNSELECTED -> showSideLayout()
+                    else -> showChessboardActivity(game.side)
+                }
+            }
+        }
+    }
+
+    private fun showMainLayout() {
+        chooseModeLayout.visibility = View.INVISIBLE
+        chooseSideLayout.visibility = View.INVISIBLE
+
+        mainLayout.visibility = View.VISIBLE
+    }
+
+    private fun showModeLayout() {
+        mainLayout.visibility = View.INVISIBLE
+        chooseSideLayout.visibility = View.INVISIBLE
+
+        chooseModeLayout.visibility = View.VISIBLE
+    }
+
+    private fun showSideLayout() {
+        mainLayout.visibility = View.INVISIBLE
+        chooseModeLayout.visibility = View.INVISIBLE
+
+        chooseSideLayout.visibility = View.VISIBLE
+    }
+
+    private fun showChessboardActivity(side: ExtendedSide) {
+        val intent = Intent(this, ChessboardActivity::class.java)
+        intent.putExtra(GAME, game)
+        intent.putExtra(EXTENDED_SIDE, side)
+        startActivity(intent)
+    }
+
+    private val userId get() = getUserId(applicationContext)
 }
 
 @SuppressLint("HardwareIds")
-fun getUserId(context: Context) = getString(context.contentResolver, Settings.Secure.ANDROID_ID)
+fun getUserId(context: Context): String = getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 
