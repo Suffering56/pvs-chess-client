@@ -33,7 +33,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     private lateinit var state: State
     fun isInitialized() = ::state.isInitialized
-    fun getState() = if (isInitialized()) state else null   //TODO: IUnmodifiableState
+    fun getState(): IUnmodifiableState? = if (isInitialized()) state else null
 
     var getAvailableMovesListener: ((rowIndex: Int, columnIndex: Int) -> Set<PointDTO>)? = null
     var applyMoveListener: ((move: MoveDTO) -> ChangesDTO)? = null
@@ -197,8 +197,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             img.setBackgroundResource(R.drawable.cell_checked_2)
         }
 
-        //TODO: markMouseOver() -> only for available
-
         fun unmark() {
             img.setBackgroundResource(TRANSPARENT)
         }
@@ -222,15 +220,20 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
     }
 
-    class State(chessboard: ChessboardDTO? = null) : Serializable {
+    interface IUnmodifiableState : Serializable {
+        val position: Int
+        val side: Side?
+    }
+
+    class State(chessboard: ChessboardDTO? = null) : IUnmodifiableState {
         lateinit var chessboard: ChessboardDTO
 
         init {
             chessboard?.let { updateChessboard(it) }
         }
 
-        var position = 0
-        var side: Side? = null  //if side == null -> isViewer
+        override var position = 0
+        override var side: Side? = null  //if side == null -> isViewer
 
         var selectedPoint: PointDTO? = null
         var availablePoints: Set<PointDTO>? = null

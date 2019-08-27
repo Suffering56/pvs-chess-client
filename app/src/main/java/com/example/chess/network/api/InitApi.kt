@@ -14,6 +14,9 @@ import retrofit2.http.Query
  */
 interface InitApi {
 
+    @GET("debug/version")
+    fun getVersion(): Call<String>
+
     @GET("init/new")
     fun createGame(): Call<GameDTO>
 

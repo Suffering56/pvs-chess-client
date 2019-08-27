@@ -77,7 +77,6 @@ class ChessboardActivity : BaseActivity() {
 
     @OnClick(R.id.rotateButton)
     fun rotateChessboard() {
-        val side = chessboardView.getState()!!.side
-        side?.let { chessboardView.setSide(it.reverse()) }
+        chessboardView.getState()!!.side?.let { chessboardView.setSide(it.reverse()) }
     }
 }

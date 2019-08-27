@@ -43,6 +43,20 @@ class MainActivity : BaseActivity() {
         activityComponent.inject(this)
         ButterKnife.bind(this)
 
+//        Thread {
+//            networkService.debugApi.getVersion()
+//                .enqueue {
+//                    println("debugApiVersion = ${it.body()}")
+//                }
+//        }.start()
+
+        Thread {
+            networkService.initApi.getVersion()
+                .enqueue {
+                    println("initApiVersion = ${it.body()}")
+                }
+        }.start()
+
         showNextStep()
     }
 
