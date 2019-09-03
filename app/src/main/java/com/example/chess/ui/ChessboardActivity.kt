@@ -45,11 +45,15 @@ class ChessboardActivity : BaseActivity() {
         activityComponent.inject(this)
         ButterKnife.bind(this)
 
-        chessboardView.getAvailableMovesListener = getAvailableMovesListener
-        chessboardView.applyMoveListener = applyMoveListener
-
         val game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
         val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
+        val userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
+
+        chessboardView.getAvailableMovesListener = { rowIndex, columnIndex ->
+            networkService.gameApi.getAvailableMoves(userId, game.id, rowIndex, columnIndex)
+        }
+//        chessboardView.getAvailableMovesListener = getAvailableMovesListener
+        chessboardView.applyMoveListener = applyMoveListener
 
         Thread {
             networkService.debugApi.getChessboard()

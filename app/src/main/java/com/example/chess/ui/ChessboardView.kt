@@ -12,7 +12,9 @@ import com.example.chess.shared.dto.*
 import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
 import com.example.chess.utils.changeSize
+import com.example.chess.utils.enqueue
 import kotlinx.android.synthetic.main.chessboard_view.view.*
+import retrofit2.Call
 import java.io.Serializable
 import java.util.*
 
@@ -35,7 +37,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     fun isInitialized() = ::state.isInitialized
     fun getState(): IUnmodifiableState? = if (isInitialized()) state else null
 
-    var getAvailableMovesListener: ((rowIndex: Int, columnIndex: Int) -> Set<PointDTO>)? = null
+    var getAvailableMovesListener: ((rowIndex: Int, columnIndex: Int) -> Call<Set<PointDTO>>)? = null       //TODO replace with BiConsumer
     var applyMoveListener: ((move: MoveDTO) -> ChangesDTO)? = null
 
     init {
@@ -157,7 +159,13 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             state.cleanHighlighting()
 
         } else {
-            state.availablePoints = getAvailableMovesListener?.invoke(rowIndex, columnIndex)
+            getAvailableMovesListener?.invoke(rowIndex, columnIndex)?.enqueue {
+                this.post {
+                    state.availablePoints = it.body()!!
+                    updateViewByState()
+                }
+            }
+
             state.selectedPoint = selectedPoint
         }
 

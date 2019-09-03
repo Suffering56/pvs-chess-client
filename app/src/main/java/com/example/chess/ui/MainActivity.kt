@@ -29,6 +29,7 @@ class MainActivity : BaseActivity() {
     companion object {
         const val GAME = "game"
         const val SIDE = "side"
+        const val USER_ID = "userId"
     }
 
     @Inject
@@ -42,21 +43,7 @@ class MainActivity : BaseActivity() {
         setContentView(R.layout.main_activity)
         activityComponent.inject(this)
         ButterKnife.bind(this)
-
-//        Thread {
-//            networkService.debugApi.getVersion()
-//                .enqueue {
-//                    println("debugApiVersion = ${it.body()}")
-//                }
-//        }.start()
-
-        Thread {
-            networkService.initApi.getVersion()
-                .enqueue {
-                    println("initApiVersion = ${it.body()}")
-                }
-        }.start()
-
+        //TODO: надо как-то победить долгий первый вызов ретрофита
         showNextStep()
     }
 
@@ -191,6 +178,7 @@ class MainActivity : BaseActivity() {
         val intent = Intent(this, ChessboardActivity::class.java)
         intent.putExtra(GAME, game)
         intent.putExtra(SIDE, side)
+        intent.putExtra(USER_ID, userId)
         startActivity(intent)
     }
 
