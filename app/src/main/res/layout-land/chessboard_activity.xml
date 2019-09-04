@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         tools:context=".ui.ChessboardActivity">
 
-    <com.example.chess.ui.ChessboardView
+    <com.example.chess.ui.custom.chessboard.ChessboardView
             android:layout_width="0dp"
             android:layout_height="0dp"
 

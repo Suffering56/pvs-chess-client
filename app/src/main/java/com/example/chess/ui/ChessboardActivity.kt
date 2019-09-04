@@ -5,11 +5,9 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import com.example.chess.R
 import com.example.chess.network.INetworkService
-import com.example.chess.shared.dto.ChangesDTO
 import com.example.chess.shared.dto.GameDTO
-import com.example.chess.shared.dto.MoveDTO
-import com.example.chess.shared.dto.PointDTO
 import com.example.chess.shared.enums.Side
+import com.example.chess.ui.custom.chessboard.ChessboardViewState
 import com.example.chess.utils.enqueue
 import kotlinx.android.synthetic.main.chessboard_activity.*
 import javax.inject.Inject
@@ -24,21 +22,6 @@ class ChessboardActivity : BaseActivity() {
     @Inject
     lateinit var networkService: INetworkService
 
-    private val getAvailableMovesListener: (Int, Int) -> Set<PointDTO> = { _, _ ->
-        setOf(
-            PointDTO(0, 0),
-            PointDTO(4, 3),
-            PointDTO(4, 4),
-            PointDTO(4, 5),
-            PointDTO(4, 6),
-            PointDTO(5, 2)
-        )
-    }
-
-    private val applyMoveListener: (MoveDTO) -> ChangesDTO = { move ->
-        ChangesDTO(chessboardView.getState()!!.position + 1, move, PointDTO(7, 3))
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chessboard_activity)
@@ -49,11 +32,19 @@ class ChessboardActivity : BaseActivity() {
         val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
         val userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
 
-        chessboardView.getAvailableMovesListener = { rowIndex, columnIndex ->
+        chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->
             networkService.gameApi.getAvailableMoves(userId, game.id, rowIndex, columnIndex)
+                .enqueue {
+                    chessboardView.updateAvailablePoints(it.body()!!)
+                }
         }
-//        chessboardView.getAvailableMovesListener = getAvailableMovesListener
-        chessboardView.applyMoveListener = applyMoveListener
+
+        chessboardView.applyMoveHandler = { move ->
+            networkService.gameApi.applyMove(userId, game.id, move)
+                .enqueue {
+                    chessboardView.applyStateChanges(it.body()!!)
+                }
+        }
 
         Thread {
             networkService.debugApi.getChessboard()
@@ -64,7 +55,7 @@ class ChessboardActivity : BaseActivity() {
                         }
                     }
                 }
-        }.start()   //first service call is too long
+        }.start()
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle?) {
@@ -75,7 +66,7 @@ class ChessboardActivity : BaseActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        val chessboardState = savedInstanceState?.get(CHESSBOARD_STATE) as ChessboardView.State?
+        val chessboardState = savedInstanceState?.get(CHESSBOARD_STATE) as ChessboardViewState?
         chessboardState?.let { chessboardView.init(it) }
     }
 

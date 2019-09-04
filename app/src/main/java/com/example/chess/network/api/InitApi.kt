@@ -21,7 +21,10 @@ interface InitApi {
     fun createGame(): Call<GameDTO>
 
     @GET("init/continue")
-    fun getGame(@Query("userId") userId: String, @Query("gameId") gameId: Long): Call<GameDTO>
+    fun getGame(
+        @Query("userId") userId: String,
+        @Query("gameId") gameId: Long
+    ): Call<GameDTO>
 
     @POST("init/mode")
     fun setGameMode(
