@@ -6,6 +6,7 @@ import butterknife.OnClick
 import com.example.chess.R
 import com.example.chess.network.INetworkService
 import com.example.chess.shared.dto.GameDTO
+import com.example.chess.shared.enums.GameMode
 import com.example.chess.shared.enums.Side
 import com.example.chess.ui.custom.chessboard.ChessboardViewState
 import com.example.chess.utils.enqueue
@@ -43,11 +44,14 @@ class ChessboardActivity : BaseActivity() {
             networkService.gameApi.applyMove(userId, game.id, move)
                 .enqueue {
                     chessboardView.applyStateChanges(it.body()!!)
+                    if (game.mode == GameMode.SINGLE) {
+                        chessboardView.setSide(chessboardView.getState()?.side?.reverse())
+                    }
                 }
         }
 
         Thread {
-            networkService.debugApi.getChessboard()
+            networkService.gameApi.getChessboard(userId, game.id)
                 .enqueue { response ->
                     response.body()?.let {
                         if (!chessboardView.isInitialized()) {

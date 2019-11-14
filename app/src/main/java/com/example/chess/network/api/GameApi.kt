@@ -1,6 +1,7 @@
 package com.example.chess.network.api
 
 import com.example.chess.shared.dto.ChangesDTO
+import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.dto.MoveDTO
 import com.example.chess.shared.dto.PointDTO
 import retrofit2.Call
@@ -30,4 +31,11 @@ interface GameApi {
         @Query("gameId") gameId: Long,
         @Body move: MoveDTO
     ): Call<ChangesDTO>
+
+    @GET("game/chessboard")
+    fun getChessboard(
+        @Query("userId") userId: String,
+        @Query("gameId") gameId: Long,
+        @Query("position") position: Int? = null
+    ): Call<ChessboardDTO>
 }

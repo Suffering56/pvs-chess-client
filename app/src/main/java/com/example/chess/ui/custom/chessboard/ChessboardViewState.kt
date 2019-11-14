@@ -52,11 +52,11 @@ class ChessboardViewState(chessboard: ChessboardDTO? = null) : IUnmodifiableChes
     }
 
     private fun executeMove(move: MoveDTO) {
-        val cellFrom = chessboard.matrix[move.from.rowIndex][move.from.columnIndex]
+        val cellFrom = chessboard.matrix[move.from.row][move.from.col]
 
         //TODO: вообще плохо пользоваться тем что ChessboardDTO не immutable -> нужно сделать immutable и добавить toBuilder()
-        chessboard.matrix[move.from.rowIndex][move.from.columnIndex] = CellDTO(move.from, null)
-        chessboard.matrix[move.to.rowIndex][move.to.columnIndex] = cellFrom
+        chessboard.matrix[move.from.row][move.from.col] = CellDTO(move.from, null)
+        chessboard.matrix[move.to.row][move.to.col] = cellFrom
     }
 
     internal fun isAvailablePoint(point: PointDTO) = availablePoints?.contains(point) ?: false

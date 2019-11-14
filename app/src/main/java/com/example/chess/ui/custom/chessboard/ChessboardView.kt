@@ -68,7 +68,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         check(!isInitialized())
 
         this.state = ChessboardViewState(chessboard)
-        setSide(side)
+        setSide(side, true)
 
         repaint()
     }
@@ -77,7 +77,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         check(!isInitialized())
 
         this.state = state
-        setSide(state.side)
+        setSide(state.side, true)
 
         repaint()
     }
@@ -92,13 +92,15 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         repaint()
     }
 
-    fun setSide(side: Side?) {
+    fun setSide(side: Side?, isNeedToRotate: Boolean = false) {
         state.side = side
 
-        rotation = when (side) {
-            Side.WHITE -> 180f
-            Side.BLACK -> 0f
-            else -> 180f
+        if (isNeedToRotate) {
+            rotation = when (side) {
+                Side.WHITE -> 180f
+                Side.BLACK -> 0f
+                else -> 180f
+            }
         }
     }
 
@@ -148,7 +150,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     }
 
     private fun getCell(point: PointDTO): CellImageWrapper {
-        return cellsMatrices[point.rowIndex][point.columnIndex]
+        return cellsMatrices[point.row][point.col]
     }
 
     override fun setRotation(rotation: Float) {
