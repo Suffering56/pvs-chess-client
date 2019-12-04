@@ -22,6 +22,7 @@ class ChessboardActivity : BaseActivity() {
 
     @Inject
     lateinit var networkService: INetworkService
+    lateinit var game: GameDTO
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +30,7 @@ class ChessboardActivity : BaseActivity() {
         activityComponent.inject(this)
         ButterKnife.bind(this)
 
-        val game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
+        game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
         val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
         val userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
 
@@ -76,6 +77,7 @@ class ChessboardActivity : BaseActivity() {
 
     @OnClick(R.id.rotateButton)
     fun rotateChessboard() {
+        check(game.mode == GameMode.PVP) { "rotation is available only in PVP mode. actual mode: ${game.mode}" }
         chessboardView.getState()!!.side?.let { chessboardView.setSide(it.reverse()) }
     }
 }

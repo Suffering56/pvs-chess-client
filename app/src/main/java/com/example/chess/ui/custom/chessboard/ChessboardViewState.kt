@@ -47,6 +47,7 @@ class ChessboardViewState(chessboard: ChessboardDTO? = null) : IUnmodifiableChes
         checkedPoint = changes.checkedPoint
 
         executeMove(changes.lastMove)
+        changes.additionalMove?.let { executeMove(it) }
 
         cleanHighlighting()
     }
@@ -56,6 +57,10 @@ class ChessboardViewState(chessboard: ChessboardDTO? = null) : IUnmodifiableChes
 
         //TODO: вообще плохо пользоваться тем что ChessboardDTO не immutable -> нужно сделать immutable и добавить toBuilder()
         chessboard.matrix[move.from.row][move.from.col] = CellDTO(move.from, null)
+
+        if (isCutMove(move)) {
+            return
+        }
         chessboard.matrix[move.to.row][move.to.col] = cellFrom
     }
 
@@ -66,4 +71,6 @@ class ChessboardViewState(chessboard: ChessboardDTO? = null) : IUnmodifiableChes
     internal fun isSelfTurn() = side == nextTurnSide()
 
     private fun nextTurnSide() = if (position % 2 == 0) Side.WHITE else Side.BLACK
+
+    private fun isCutMove(move: MoveDTO) = move.from == move.to
 }
