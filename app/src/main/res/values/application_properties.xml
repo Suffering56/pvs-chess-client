@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--server_api_address это Адрес IPv4-->
-    <!--<string name="server_api_address" translatable="false">http://172.18.64.170:8080/api/</string>-->
-    <string name="server_api_address" translatable="false">http://192.168.0.103:8080/api/</string>
+    <string name="server_api_address" translatable="false">http://172.18.64.170:8080/api/</string>
+    <!--<string name="server_api_address" translatable="false">http://192.168.0.103:8080/api/</string>-->
 </resources>

@@ -161,6 +161,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
+//        val cellSize = (w - 2 * resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt()) / BOARD_SIZE
         val cellSize = w / BOARD_SIZE
 
         this.post {
