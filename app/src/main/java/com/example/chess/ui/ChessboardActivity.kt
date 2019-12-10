@@ -77,6 +77,7 @@ class ChessboardActivity : BaseActivity() {
 
     @OnClick(R.id.rotateButton)
     fun rotateChessboard() {
+        //TODO: нужен safeCheck, который не будет крашить приложение
         check(game.mode == GameMode.PVP) { "rotation is available only in PVP mode. actual mode: ${game.mode}" }
         chessboardView.getState()!!.side?.let { chessboardView.setSide(it.reverse()) }
     }

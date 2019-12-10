@@ -3,4 +3,23 @@
     <string name="action_settings" translatable="false">Settings</string>
     <string name="init_button_new_game">New game</string>
     <string name="download_chessboard_button" translatable="false">Download Chessboard</string>
+    <string name="chessboard_background_description" translatable="false"/>
+
+    <string name="legend_chessboard_a" translatable="false">a</string>
+    <string name="legend_chessboard_b" translatable="false">b</string>
+    <string name="legend_chessboard_c" translatable="false">c</string>
+    <string name="legend_chessboard_d" translatable="false">d</string>
+    <string name="legend_chessboard_e" translatable="false">e</string>
+    <string name="legend_chessboard_f" translatable="false">f</string>
+    <string name="legend_chessboard_g" translatable="false">g</string>
+    <string name="legend_chessboard_h" translatable="false">h</string>
+
+    <string name="legend_chessboard_a7" translatable="false">7</string>
+    <string name="legend_chessboard_b6" translatable="false">6</string>
+    <string name="legend_chessboard_c5" translatable="false">5</string>
+    <string name="legend_chessboard_d4" translatable="false">4</string>
+    <string name="legend_chessboard_e3" translatable="false">3</string>
+    <string name="legend_chessboard_f2" translatable="false">2</string>
+    <string name="legend_chessboard_g1" translatable="false">1</string>
+    <string name="legend_chessboard_h0" translatable="false">0</string>
 </resources>

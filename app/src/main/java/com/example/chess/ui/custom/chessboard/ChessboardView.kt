@@ -154,8 +154,11 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         return cellsMatrices[point.row][point.col]
     }
 
+    /**
+     * Переворачиваем только chessboardTable
+     */
     override fun setRotation(rotation: Float) {
-        super.setRotation(rotation)
+        chessboardTable.rotation = rotation
         cellsStream.forEach { it.img.rotation = rotation }
     }
 
@@ -166,6 +169,8 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
         this.post {
             chessboardProgressBar.changeSize(cellSize * 2)
+
+            //TODO: legend.changeSize
 
             Arrays.stream(cellsMatrices)
                 .flatMap { Arrays.stream(it) }
