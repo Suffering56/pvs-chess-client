@@ -7,6 +7,7 @@ import com.example.chess.R
 import com.example.chess.network.INetworkService
 import com.example.chess.shared.dto.GameDTO
 import com.example.chess.shared.enums.GameMode
+import com.example.chess.shared.enums.PieceType
 import com.example.chess.shared.enums.Side
 import com.example.chess.ui.custom.chessboard.ChessboardViewState
 import com.example.chess.utils.enqueue
@@ -18,6 +19,7 @@ class ChessboardActivity : BaseActivity() {
 
     companion object {
         private const val CHESSBOARD_STATE = "CHESSBOARD_STATE"
+        private const val SINGLE_MOVE_AUTO_ROTATION_ENABLED = false
     }
 
     @Inject
@@ -46,9 +48,14 @@ class ChessboardActivity : BaseActivity() {
                 .enqueue {
                     chessboardView.applyStateChanges(it.body()!!)
                     if (game.mode == GameMode.SINGLE) {
-                        chessboardView.setSide(chessboardView.getState()?.side?.reverse())
+                        chessboardView.setSide(chessboardView.getState()?.side?.reverse(), SINGLE_MOVE_AUTO_ROTATION_ENABLED)
                     }
                 }
+        }
+
+        chessboardView.choosePawnTransformationPieceHandler = {
+            //https://developer.android.com/guide/topics/ui/dialogs
+            PieceType.QUEEN
         }
 
         Thread {
@@ -79,6 +86,6 @@ class ChessboardActivity : BaseActivity() {
     fun rotateChessboard() {
         //TODO: нужен safeCheck, который не будет крашить приложение
         check(game.mode == GameMode.PVP) { "rotation is available only in PVP mode. actual mode: ${game.mode}" }
-        chessboardView.getState()!!.side?.let { chessboardView.setSide(it.reverse()) }
+        chessboardView.getState()!!.side?.let { chessboardView.setSide(it.reverse(), true) }
     }
 }

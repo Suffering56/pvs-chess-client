@@ -13,6 +13,7 @@ import com.example.chess.shared.dto.ChangesDTO
 import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.dto.MoveDTO
 import com.example.chess.shared.dto.PointDTO
+import com.example.chess.shared.enums.PieceType
 import com.example.chess.shared.enums.Side
 import com.example.chess.utils.changeSize
 import kotlinx.android.synthetic.main.chessboard_view.view.*
@@ -38,6 +39,8 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     var availablePieceClickHandler: ((rowIndex: Int, columnIndex: Int) -> Unit)? = null
     var applyMoveHandler: ((move: MoveDTO) -> Unit)? = null
+    var choosePawnTransformationPieceHandler: (() -> PieceType)? = null
+
     private val legendOffset = resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt()
 
     init {
@@ -94,7 +97,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         repaint()
     }
 
-    fun setSide(side: Side?, isNeedToRotate: Boolean = true) {
+    fun setSide(side: Side?, isNeedToRotate: Boolean) {
         state.side = side
 
         if (isNeedToRotate) {
@@ -112,7 +115,15 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
         if (state.isAvailablePoint(selectedPoint)) {
             //кликнули по доступной для хода ячейки - значит нужно выполнить ход
-            applyMoveHandler?.invoke(MoveDTO(state.selectedPoint!!, selectedPoint))
+
+            var pawnTransformationPiece: PieceType? = null
+            if ((rowIndex == 0 || rowIndex == 7)
+                && getCell(state.selectedPoint!!).piece!!.isPawn()
+            ) {
+                pawnTransformationPiece = choosePawnTransformationPieceHandler?.invoke()
+            }
+
+            applyMoveHandler?.invoke(MoveDTO(state.selectedPoint!!, selectedPoint, pawnTransformationPiece))
 
         } else if (selectedPoint == state.selectedPoint || !state.isSelfPiece(selectedCell.piece) || !state.isSelfTurn()) {
             state.cleanHighlighting()
