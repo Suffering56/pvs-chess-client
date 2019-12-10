@@ -57,6 +57,16 @@ class MainActivity : BaseActivity() {
 
     @OnClick(R.id.newGameButton)
     fun createNewGame() {
+//        game = GameDTO(
+//            1,
+//            0,
+//            GameMode.SINGLE,
+//            Side.WHITE,
+//            emptyList()
+//        )
+//        showNextStep()
+//        return
+
         progressBar.visibility = View.VISIBLE
 
         Thread {
