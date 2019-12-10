@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TableRow
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.children
 import com.example.chess.R
 import com.example.chess.shared.dto.ChangesDTO
 import com.example.chess.shared.dto.ChessboardDTO
@@ -93,7 +94,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         repaint()
     }
 
-    fun setSide(side: Side?, isNeedToRotate: Boolean = false) {
+    fun setSide(side: Side?, isNeedToRotate: Boolean = true) {
         state.side = side
 
         if (isNeedToRotate) {
@@ -160,6 +161,14 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     override fun setRotation(rotation: Float) {
         chessboardTable.rotation = rotation
         cellsStream.forEach { it.img.rotation = rotation }
+
+        val legendRotation = 180f - rotation
+        for (legend in sequenceOf(legendLeft, legendRight, legendTop, legendBottom)) {
+            legend.rotation = legendRotation
+            for (child in legend.children) {
+                child.rotation = legendRotation
+            }
+        }
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -170,11 +179,17 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         this.post {
             chessboardProgressBar.changeSize(cellSize * 2)
 
-            //TODO: legend.changeSize
-
             Arrays.stream(cellsMatrices)
                 .flatMap { Arrays.stream(it) }
                 .forEach { it.img.changeSize(cellSize) }
+
+            for (child in legendTop.children + legendBottom.children) {
+                child.changeSize(cellSize, legendOffset)
+            }
+
+            for (child in legendLeft.children + legendRight.children) {
+                child.changeSize(legendOffset, cellSize)
+            }
         }
     }
 }

@@ -14,12 +14,28 @@
     <string name="legend_chessboard_g" translatable="false">g</string>
     <string name="legend_chessboard_h" translatable="false">h</string>
 
-    <string name="legend_chessboard_a7" translatable="false">7</string>
-    <string name="legend_chessboard_b6" translatable="false">6</string>
-    <string name="legend_chessboard_c5" translatable="false">5</string>
-    <string name="legend_chessboard_d4" translatable="false">4</string>
-    <string name="legend_chessboard_e3" translatable="false">3</string>
-    <string name="legend_chessboard_f2" translatable="false">2</string>
-    <string name="legend_chessboard_g1" translatable="false">1</string>
-    <string name="legend_chessboard_h0" translatable="false">0</string>
+    <string name="legend_chessboard_c7" translatable="false">c7</string>
+    <string name="legend_chessboard_c6" translatable="false">c6</string>
+    <string name="legend_chessboard_c5" translatable="false">c5</string>
+    <string name="legend_chessboard_c4" translatable="false">c4</string>
+    <string name="legend_chessboard_c3" translatable="false">c3</string>
+    <string name="legend_chessboard_c2" translatable="false">c2</string>
+    <string name="legend_chessboard_c1" translatable="false">c1</string>
+    <string name="legend_chessboard_c0" translatable="false">c0</string>
+    <string name="legend_chessboard_r7">r7</string>
+    <string name="legend_chessboard_r6">r6</string>
+    <string name="legend_chessboard_r5">r5</string>
+    <string name="legend_chessboard_r4">r4</string>
+    <string name="legend_chessboard_r3">r3</string>
+    <string name="legend_chessboard_r2">r2</string>
+    <string name="legend_chessboard_r1">r1</string>
+    <string name="legend_chessboard_r0">r0</string>
+    <string name="legend_chessboard_1">1</string>
+    <string name="legend_chessboard_2">2</string>
+    <string name="legend_chessboard_3">3</string>
+    <string name="legend_chessboard_4">4</string>
+    <string name="legend_chessboard_5">5</string>
+    <string name="legend_chessboard_6">6</string>
+    <string name="legend_chessboard_7">7</string>
+    <string name="legend_chessboard_8">8</string>
 </resources>

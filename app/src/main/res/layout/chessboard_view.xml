@@ -7,7 +7,8 @@
         android:layout_height="match_parent"
 
         app:layout_constraintDimensionRatio="1:1"
-        android:background="#CC3F51B5">
+>
+<!--android:background="#CC3F51B5"-->
 
     <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/chessboardViewContent"
@@ -18,13 +19,14 @@
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
 
             android:layout_marginStart="@dimen/chessboard_offset_for_legend"
             android:layout_marginEnd="@dimen/chessboard_offset_for_legend"
             android:layout_marginTop="@dimen/chessboard_offset_for_legend"
 
             tools:ignore="MissingConstraints"
-            app:layout_constraintTop_toTopOf="parent" android:background="@color/transparentRed">
+    >
 
         <ImageView
                 android:id="@+id/chessboardBackground"
@@ -41,7 +43,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:contentDescription="@string/chessboard_background_description"/>
-                <!--android:alpha="0"-->
+        <!--android:alpha="0"-->
 
         <TableLayout
                 android:id="@+id/chessboardTable"
@@ -73,7 +75,8 @@
         />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <TableRow
+    <LinearLayout
+            android:id="@+id/legendBottom"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="@dimen/chessboard_offset_for_legend"
@@ -85,8 +88,6 @@
             android:layout_marginTop="0dp"
             android:layout_marginEnd="@dimen/chessboard_offset_for_legend"
             android:layout_marginStart="@dimen/chessboard_offset_for_legend"
-
-            android:background="#8BC34A"
     >
         <TextView
                 android:text="@string/legend_chessboard_a"
@@ -128,8 +129,9 @@
                 android:layout_width="45.5dp"
                 android:layout_height="match_parent" android:id="@+id/legend7"
                 android:gravity="center"/>
-    </TableRow>
-    <TableRow
+    </LinearLayout>
+    <LinearLayout
+            android:id="@+id/legendTop"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="@dimen/chessboard_offset_for_legend"
@@ -141,49 +143,154 @@
             android:layout_marginBottom="0dp"
             android:layout_marginEnd="@dimen/chessboard_offset_for_legend"
             android:layout_marginStart="@dimen/chessboard_offset_for_legend"
-
-            android:background="#FFEB3B"
     >
         <TextView
-                android:text="@string/legend_chessboard_a7"
+                android:text="@string/legend_chessboard_c7"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend8"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
-                android:text="@string/legend_chessboard_b6"
+                android:text="@string/legend_chessboard_c6"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend9"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
                 android:text="@string/legend_chessboard_c5"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend10"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
-                android:text="@string/legend_chessboard_d4"
+                android:text="@string/legend_chessboard_c4"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend11"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
-                android:text="@string/legend_chessboard_e3"
+                android:text="@string/legend_chessboard_c3"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend12"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
-                android:text="@string/legend_chessboard_f2"
+                android:text="@string/legend_chessboard_c2"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend13"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
-                android:text="@string/legend_chessboard_g1"
+                android:text="@string/legend_chessboard_c1"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend14"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
-                android:text="@string/legend_chessboard_h0"
+                android:text="@string/legend_chessboard_c0"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend15"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
-    </TableRow>
+    </LinearLayout>
+    <LinearLayout
+            android:id="@+id/legendLeft"
+            android:orientation="vertical"
+            android:layout_width="@dimen/chessboard_offset_for_legend"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintEnd_toStartOf="@+id/chessboardViewContent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+
+            android:layout_marginTop="@dimen/chessboard_offset_for_legend"
+    >
+        <TextView
+                android:text="@string/legend_chessboard_8"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_7"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_6"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_5"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_4"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_3"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_2"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_1"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/legendRight"
+            android:orientation="vertical"
+            android:layout_width="@dimen/chessboard_offset_for_legend"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintStart_toEndOf="@id/chessboardViewContent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            android:layout_marginTop="@dimen/chessboard_offset_for_legend"
+    >
+        <TextView
+                android:text="@string/legend_chessboard_r7"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_r6"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_r5"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_r4"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_r3"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_r2"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_r1"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+        <TextView
+                android:text="@string/legend_chessboard_r0"
+                android:layout_width="match_parent"
+                android:layout_height="45.5dp"
+                android:gravity="center"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
