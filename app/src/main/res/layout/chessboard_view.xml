@@ -14,23 +14,53 @@
             android:id="@+id/chessboardViewContent"
 
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="0dp"
             app:layout_constraintDimensionRatio="1:1"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
 
             android:layout_marginStart="@dimen/chessboard_offset_for_legend"
-            android:layout_marginEnd="@dimen/chessboard_offset_for_legend">
+            android:layout_marginEnd="@dimen/chessboard_offset_for_legend"
+            android:layout_marginTop="@dimen/chessboard_offset_for_legend"
+            android:layout_marginBottom="@dimen/chessboard_offset_for_legend"
+
+            tools:ignore="MissingConstraints"
+            app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
                 android:id="@+id/chessboardBackground"
                 android:src="@drawable/board"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
                 android:scaleType="centerInside"
+
                 tools:ignore="MissingConstraints"
+
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
         />
+
+        <TableLayout
+                android:id="@+id/chessboardTable"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1:1"
+
+                tools:ignore="MissingConstraints"
+
+                app:layout_constraintTop_toTopOf="@+id/chessboardBackground"
+                app:layout_constraintStart_toStartOf="@+id/chessboardBackground"
+                app:layout_constraintEnd_toEndOf="@+id/chessboardBackground"
+                app:layout_constraintBottom_toBottomOf="@+id/chessboardBackground">
+
+            <!--android:paddingTop="@dimen/chessboard_offset_for_legend"-->
+            <!--android:paddingBottom="@dimen/chessboard_offset_for_legend">-->
+        </TableLayout>
+
         <ProgressBar
                 android:id="@+id/chessboardProgressBar"
                 style="?android:attr/progressBarStyle"
@@ -39,18 +69,11 @@
                 tools:ignore="MissingConstraints"
 
                 android:layout_marginStart="8dp"
+
                 app:layout_constraintEnd_toEndOf="@+id/chessboardTable"
                 app:layout_constraintStart_toStartOf="@+id/chessboardTable"
                 app:layout_constraintTop_toTopOf="@+id/chessboardTable"
-                app:layout_constraintBottom_toBottomOf="@+id/chessboardTable"/>
-        <TableLayout
-                android:id="@+id/chessboardTable"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                tools:ignore="MissingConstraints"
-
-                android:paddingTop="@dimen/chessboard_offset_for_legend"
-                android:paddingBottom="@dimen/chessboard_offset_for_legend"
+                app:layout_constraintBottom_toBottomOf="@+id/chessboardTable"
         />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

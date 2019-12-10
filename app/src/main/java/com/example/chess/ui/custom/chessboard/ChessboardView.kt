@@ -37,7 +37,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     var availablePieceClickHandler: ((rowIndex: Int, columnIndex: Int) -> Unit)? = null
     var applyMoveHandler: ((move: MoveDTO) -> Unit)? = null
-    private val legendOffset = resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt() * 2
+    private val legendOffset = resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt()
 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_view, this, true)
@@ -162,7 +162,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
-        val cellSize = (w - legendOffset) / BOARD_SIZE
+        val cellSize = (w - legendOffset * 2) / BOARD_SIZE
 
         this.post {
             chessboardProgressBar.changeSize(cellSize * 2)

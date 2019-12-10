@@ -11,4 +11,6 @@
     <color name="chessboardCellSelected">#A63D5A1D</color>
     <color name="chessboardCellPrevious">#66978700</color>
 
+    <color name="transparentRed">#80FF0000</color>
+
 </resources>
