@@ -1,23 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-    <!--UNUSED-->
-    <Button
-            android:text="KNIGHT"
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/appBackground">
+    <LinearLayout
+            android:id="@+id/ptrLinearLayoutTop"
+
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="130dp" android:id="@+id/chooserKnightButton"/>
-    <Button
-            android:text="BISHOP"
+            android:layout_height="100dp"
+            android:weightSum="100"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
+
+                android:background="@drawable/border"
+                android:padding="1dp">
+
+            <ImageView
+                    android:id="@+id/chooserQueenButton"
+                    android:src="@drawable/queen_white"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintDimensionRatio="1:1"
+            />
+        </FrameLayout>
+        <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
+
+                android:background="@drawable/border"
+                android:padding="1dp">
+            <ImageView
+                    android:id="@+id/chooserRookButton"
+                    android:src="@drawable/rook_white"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintDimensionRatio="1:1"
+            />
+        </FrameLayout>
+    </LinearLayout>
+    <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="130dp" android:id="@+id/chooserBishopButton"/>
-    <Button
-            android:text="ROOK"
-            android:layout_width="match_parent"
-            android:layout_height="130dp" android:id="@+id/chooserRookButton"/>
-    <Button
-            android:text="QUEEN"
-            android:layout_width="match_parent"
-            android:layout_height="130dp" android:id="@+id/chooserQueenButton"/>
-</LinearLayout>
+            android:layout_height="100dp"
+            android:weightSum="100"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ptrLinearLayoutTop">
+
+        <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
+
+                android:background="@drawable/border"
+                android:padding="1dp">
+
+            <ImageView
+                    android:id="@+id/chooserBishopButton"
+                    android:src="@drawable/bishop_white"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintDimensionRatio="1:1"
+            />
+        </FrameLayout>
+        <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="50"
+
+                android:background="@drawable/border"
+                android:padding="1dp">
+            <ImageView
+                    android:id="@+id/chooserKnightButton"
+                    android:src="@drawable/knight_white"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintDimensionRatio="1:1"
+            />
+        </FrameLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
