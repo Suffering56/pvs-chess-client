@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <!--UNUSED-->
+    <Button
+            android:text="KNIGHT"
+            android:layout_width="match_parent"
+            android:layout_height="130dp" android:id="@+id/chooserKnightButton"/>
+    <Button
+            android:text="BISHOP"
+            android:layout_width="match_parent"
+            android:layout_height="130dp" android:id="@+id/chooserBishopButton"/>
+    <Button
+            android:text="ROOK"
+            android:layout_width="match_parent"
+            android:layout_height="130dp" android:id="@+id/chooserRookButton"/>
+    <Button
+            android:text="QUEEN"
+            android:layout_width="match_parent"
+            android:layout_height="130dp" android:id="@+id/chooserQueenButton"/>
+</LinearLayout>

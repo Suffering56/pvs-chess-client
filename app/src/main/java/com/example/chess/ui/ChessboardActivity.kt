@@ -7,7 +7,6 @@ import com.example.chess.R
 import com.example.chess.network.INetworkService
 import com.example.chess.shared.dto.GameDTO
 import com.example.chess.shared.enums.GameMode
-import com.example.chess.shared.enums.PieceType
 import com.example.chess.shared.enums.Side
 import com.example.chess.ui.custom.chessboard.ChessboardViewState
 import com.example.chess.utils.enqueue
@@ -51,11 +50,6 @@ class ChessboardActivity : BaseActivity() {
                         chessboardView.setSide(chessboardView.getState()?.side?.reverse(), SINGLE_MOVE_AUTO_ROTATION_ENABLED)
                     }
                 }
-        }
-
-        chessboardView.choosePawnTransformationPieceHandler = {
-            //https://developer.android.com/guide/topics/ui/dialogs
-            PieceType.QUEEN
         }
 
         Thread {

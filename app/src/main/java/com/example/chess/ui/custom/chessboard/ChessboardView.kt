@@ -1,5 +1,6 @@
 package com.example.chess.ui.custom.chessboard
 
+import android.app.AlertDialog
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -39,7 +40,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     var availablePieceClickHandler: ((rowIndex: Int, columnIndex: Int) -> Unit)? = null
     var applyMoveHandler: ((move: MoveDTO) -> Unit)? = null
-    var choosePawnTransformationPieceHandler: (() -> PieceType)? = null
 
     private val legendOffset = resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt()
 
@@ -116,15 +116,13 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         if (state.isAvailablePoint(selectedPoint)) {
             //кликнули по доступной для хода ячейки - значит нужно выполнить ход
 
-            var pawnTransformationPiece: PieceType? = null
-            if ((rowIndex == 0 || rowIndex == 7)
-                && getCell(state.selectedPoint!!).piece!!.isPawn()
-            ) {
-                pawnTransformationPiece = choosePawnTransformationPieceHandler?.invoke()
+            if ((rowIndex == 0 || rowIndex == 7) && getCell(state.selectedPoint!!).piece!!.isPawn()) {
+                showPawnTransformationChooser {
+                    applyMoveHandler?.invoke(MoveDTO(state.selectedPoint!!, selectedPoint, it))
+                }
+            } else {
+                applyMoveHandler?.invoke(MoveDTO(state.selectedPoint!!, selectedPoint, null))
             }
-
-            applyMoveHandler?.invoke(MoveDTO(state.selectedPoint!!, selectedPoint, pawnTransformationPiece))
-
         } else if (selectedPoint == state.selectedPoint || !state.isSelfPiece(selectedCell.piece) || !state.isSelfTurn()) {
             state.cleanHighlighting()
 
@@ -133,6 +131,20 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             availablePieceClickHandler?.invoke(rowIndex, columnIndex)
             state.selectedPoint = selectedPoint
         }
+    }
+
+
+    private fun showPawnTransformationChooser(onChosen: (piece: PieceType) -> Unit) {
+        val items = arrayOf(PieceType.KNIGHT, PieceType.BISHOP, PieceType.ROOK, PieceType.QUEEN)
+
+        AlertDialog.Builder(context)
+            .setTitle("title")
+            .setItems(items.map { it.name }.toTypedArray()) { _, which ->
+                onChosen.invoke(items[which])
+            }
+            .setCancelable(false)
+            .create()
+            .show()
     }
 
     private fun repaint() {

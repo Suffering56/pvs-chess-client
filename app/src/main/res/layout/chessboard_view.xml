@@ -92,42 +92,42 @@
         <TextView
                 android:text="@string/legend_chessboard_a"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend1"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
                 android:text="@string/legend_chessboard_b"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
                 android:text="@string/legend_chessboard_c"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend2"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
                 android:text="@string/legend_chessboard_d"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend3"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
                 android:text="@string/legend_chessboard_e"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend4"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
                 android:text="@string/legend_chessboard_f"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend5"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
                 android:text="@string/legend_chessboard_g"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend6"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
         <TextView
                 android:text="@string/legend_chessboard_h"
                 android:layout_width="45.5dp"
-                android:layout_height="match_parent" android:id="@+id/legend7"
+                android:layout_height="match_parent"
                 android:gravity="center"/>
     </LinearLayout>
     <LinearLayout

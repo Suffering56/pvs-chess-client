@@ -12,7 +12,7 @@ fun <T> Call<T>.enqueue(callback: (response: Response<T>) -> Unit) {
             if (response.body() != null) {
                 callback.invoke(response)
             } else {
-                printErr("response body is null! errorBody: ${response.errorBody()}")
+                printErr("response body is null! errorBody: ${response.errorBody()?.string()}")
             }
         }
 
