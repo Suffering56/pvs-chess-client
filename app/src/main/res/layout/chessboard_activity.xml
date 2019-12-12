@@ -28,10 +28,24 @@
             app:layout_constraintBottom_toBottomOf="parent" android:gravity="center" android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent"/>
     <Button
+            android:id="@+id/rotateButton"
             android:text="Rotate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/rotateButton" android:layout_marginBottom="8dp"
+
             app:layout_constraintBottom_toTopOf="@+id/downloadChessboardButton"
-            app:layout_constraintStart_toStartOf="parent" android:layout_marginStart="8dp"/>
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"
+    />
+    <Button
+            android:id="@+id/rollbackButton"
+            android:text="Rollback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintBottom_toTopOf="@+id/rotateButton"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp"
+    />
 </androidx.constraintlayout.widget.ConstraintLayout>

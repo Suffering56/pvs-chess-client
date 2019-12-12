@@ -67,6 +67,15 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
     }
 
+    fun resetTo(chessboard: ChessboardDTO) {
+        val prevSide = this.state.side
+
+        this.state = ChessboardViewState(chessboard)
+        setSide(prevSide, true)
+
+        repaint()
+    }
+
     fun init(chessboard: ChessboardDTO, side: Side?) {
         check(!isInitialized())
 

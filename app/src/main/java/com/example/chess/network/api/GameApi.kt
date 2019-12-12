@@ -38,4 +38,11 @@ interface GameApi {
         @Query("gameId") gameId: Long,
         @Query("position") position: Int? = null
     ): Call<ChessboardDTO>
+
+    @GET("game/chessboard")
+    fun rollback(
+        @Query("userId") userId: String,
+        @Query("gameId") gameId: Long,
+        @Query("positionsOffset") positionsOffset: Int
+    ): Call<ChessboardDTO>
 }

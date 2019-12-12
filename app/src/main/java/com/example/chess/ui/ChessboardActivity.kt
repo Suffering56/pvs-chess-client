@@ -24,6 +24,7 @@ class ChessboardActivity : BaseActivity() {
     @Inject
     lateinit var networkService: INetworkService
     lateinit var game: GameDTO
+    lateinit var userId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +34,7 @@ class ChessboardActivity : BaseActivity() {
 
         game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
         val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
-        val userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
+        userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
 
         chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->
             networkService.gameApi.getAvailableMoves(userId, game.id, rowIndex, columnIndex)
@@ -46,6 +47,7 @@ class ChessboardActivity : BaseActivity() {
             networkService.gameApi.applyMove(userId, game.id, move)
                 .enqueue {
                     chessboardView.applyStateChanges(it.body()!!)
+                    //TODO: game.position++
                     if (game.mode == GameMode.SINGLE) {
                         chessboardView.setSide(chessboardView.getState()?.side?.reverse(), SINGLE_MOVE_AUTO_ROTATION_ENABLED)
                     }
@@ -81,5 +83,17 @@ class ChessboardActivity : BaseActivity() {
         //TODO: нужен safeCheck, который не будет крашить приложение
         check(game.mode == GameMode.PVP) { "rotation is available only in PVP mode. actual mode: ${game.mode}" }
         chessboardView.getState()!!.side?.let { chessboardView.setSide(it.reverse(), true) }
+    }
+
+    @OnClick(R.id.rollbackButton)
+    fun rollback() {
+        Thread {
+            networkService.gameApi.rollback(userId, game.id, 1)
+                .enqueue { response ->
+                    response.body()?.let {
+                        chessboardView.resetTo(it)
+                    }
+                }
+        }.start()
     }
 }
