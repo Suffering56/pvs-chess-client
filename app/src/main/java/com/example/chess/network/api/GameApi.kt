@@ -17,7 +17,7 @@ import retrofit2.http.Query
 
 interface GameApi {
 
-    @GET("game/move")
+    @GET("game/moves")
     fun getAvailableMoves(
         @Query("userId") userId: String,
         @Query("gameId") gameId: Long,
@@ -39,7 +39,7 @@ interface GameApi {
         @Query("position") position: Int? = null
     ): Call<ChessboardDTO>
 
-    @GET("game/chessboard")
+    @POST("game/rollback")
     fun rollback(
         @Query("userId") userId: String,
         @Query("gameId") gameId: Long,

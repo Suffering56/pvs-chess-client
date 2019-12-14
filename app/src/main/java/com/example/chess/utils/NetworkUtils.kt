@@ -12,7 +12,8 @@ fun <T> Call<T>.enqueue(callback: (response: Response<T>) -> Unit) {
             if (response.body() != null) {
                 callback.invoke(response)
             } else {
-                printErr("response body is null! errorBody: ${response.errorBody()?.string()}")
+                val errorString = response.errorBody()?.string()
+                printErr("response body is null! errorBody: $errorString")
             }
         }
 
