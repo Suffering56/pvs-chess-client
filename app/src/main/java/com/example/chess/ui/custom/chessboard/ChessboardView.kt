@@ -13,6 +13,7 @@ import com.example.chess.shared.dto.ChangesDTO
 import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.dto.MoveDTO
 import com.example.chess.shared.dto.PointDTO
+import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
 import com.example.chess.utils.changeSize
 import kotlinx.android.synthetic.main.chessboard_view.view.*
@@ -125,7 +126,13 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                 val pieceFrom = getCell(state.selectedPoint!!).piece!!
                 if (pieceFrom.isPawn()) {
                     PawnTransformationChooser(context, pieceFrom.side) {
-                        applyMoveHandler?.invoke(MoveDTO(state.selectedPoint!!, selectedPoint, it))
+                        applyMoveHandler?.invoke(
+                            MoveDTO(
+                                state.selectedPoint!!,
+                                selectedPoint,
+                                Piece.of(pieceFrom.side, it)
+                            )
+                        )
                     }.show()
                     return
                 }

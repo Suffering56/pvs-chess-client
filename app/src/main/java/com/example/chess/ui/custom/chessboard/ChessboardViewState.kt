@@ -62,12 +62,12 @@ class ChessboardViewState(chessboard: ChessboardDTO? = null) : IUnmodifiableChes
             return
         }
 
-        if (move.pawnTransformationPieceType == null) {
+        if (move.pawnTransformationPiece == null) {
             chessboard.matrix[move.to.row][move.to.col] = CellDTO(move.to, pieceFrom)
         } else {
             chessboard.matrix[move.to.row][move.to.col] = CellDTO(
                 move.to,
-                Piece.of(pieceFrom!!.side, move.pawnTransformationPieceType!!)
+                move.pawnTransformationPiece
             )
         }
     }
