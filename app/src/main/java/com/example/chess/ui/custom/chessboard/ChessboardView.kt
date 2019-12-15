@@ -9,6 +9,7 @@ import android.widget.TableRow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import com.example.chess.R
+import com.example.chess.shared.Constants.EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION
 import com.example.chess.shared.dto.ChangesDTO
 import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.dto.MoveDTO
@@ -75,6 +76,15 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         repaint()
     }
 
+    fun initForConstructor(chessboard: ChessboardDTO, side: Side?) {
+        check(!isInitialized())
+
+        this.state = ChessboardViewState(chessboard, true, EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION)
+        setSide(side, true)
+
+        repaint()
+    }
+
     fun init(chessboard: ChessboardDTO, side: Side?) {
         check(!isInitialized())
 
@@ -91,6 +101,10 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         setSide(state.side, true)
 
         repaint()
+    }
+
+    fun updateConstructorPiece(piece: Piece) {
+        state.constructorPiece = piece
     }
 
     fun updateAvailablePoints(availablePoints: Set<PointDTO>) {
@@ -118,6 +132,11 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     private fun onCellClick(rowIndex: Int, columnIndex: Int) {
         val selectedCell = cellsMatrices[rowIndex][columnIndex]
         val selectedPoint = selectedCell.point
+
+        if (state.isConstructorEnabled) {
+            state.executeConstructorMove(selectedPoint)
+            return
+        }
 
         if (state.isAvailablePoint(selectedPoint)) {
             //кликнули по доступной для хода ячейки - значит нужно выполнить ход

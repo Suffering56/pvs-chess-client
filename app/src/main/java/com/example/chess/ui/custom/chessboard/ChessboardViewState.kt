@@ -9,20 +9,25 @@ import com.example.chess.shared.enums.Side
  *      Date: 04.09.2019
  */
 
-class ChessboardViewState(chessboard: ChessboardDTO? = null) : IUnmodifiableChessboardViewState {
+class ChessboardViewState(
+    chessboard: ChessboardDTO? = null,
+    var isConstructorEnabled: Boolean = false,
+    initialPosition: Int = 0
+) : IUnmodifiableChessboardViewState {
     lateinit var chessboard: ChessboardDTO
 
     init {
         chessboard?.let { updateChessboard(it) }
     }
 
-    override var position = 0
+    override var position = initialPosition
     override var side: Side? = null  //if side == null -> isViewer
 
     var selectedPoint: PointDTO? = null
     var availablePoints: Set<PointDTO>? = null
     var previousMove: MoveDTO? = null
     var checkedPoint: PointDTO? = null
+    var constructorPiece: Piece? = null
 
     private fun updateChessboard(chessboard: ChessboardDTO) {
         this.chessboard = chessboard
@@ -37,6 +42,19 @@ class ChessboardViewState(chessboard: ChessboardDTO? = null) : IUnmodifiableChes
     internal fun cleanHighlighting() {
         selectedPoint = null
         availablePoints = null
+    }
+
+    internal fun executeConstructorMove(pointTo: PointDTO) {
+
+        chessboard.matrix[pointTo.row][pointTo.col] = CellDTO(
+            pointTo,
+            constructorPiece
+        )
+
+        position++
+        constructorPiece = null
+
+        cleanHighlighting()
     }
 
     internal fun applyChanges(changes: ChangesDTO) {
