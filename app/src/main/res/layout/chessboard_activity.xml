@@ -18,11 +18,23 @@
             app:layout_constraintDimensionRatio="1:1"
             android:id="@+id/chessboardView"/>
 
+    <com.example.chess.ui.custom.chessboard.ChessboardConstructorBar
+            android:id="@+id/chessboardConstructorBar"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintTop_toBottomOf="@id/chessboardView"
+
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="16dp"/>
+
     <Button
             android:text="@string/download_chessboard_button"
             android:layout_width="325dp"
             android:layout_height="45dp"
-            android:id="@+id/downloadChessboardButton" app:layout_constraintEnd_toEndOf="parent"
+            android:id="@+id/downloadChessboardButton"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent" android:gravity="center" android:layout_marginStart="8dp"
@@ -30,7 +42,16 @@
     <Button
             android:id="@+id/rotateButton"
             android:text="Rotate"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+
+            app:layout_constraintBottom_toTopOf="@+id/downloadChessboardButton"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp" app:layout_constraintEnd_toEndOf="parent"/>
+    <Button
+            android:id="@+id/rollbackButton"
+            android:text="Rollback"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
 
             app:layout_constraintBottom_toTopOf="@+id/downloadChessboardButton"
@@ -38,14 +59,5 @@
             android:layout_marginStart="8dp"
             android:layout_marginBottom="8dp"
     />
-    <Button
-            android:id="@+id/rollbackButton"
-            android:text="Rollback"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
 
-            app:layout_constraintBottom_toTopOf="@+id/rotateButton"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp"
-    />
 </androidx.constraintlayout.widget.ConstraintLayout>

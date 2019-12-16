@@ -16,13 +16,14 @@ import com.example.chess.shared.dto.MoveDTO
 import com.example.chess.shared.dto.PointDTO
 import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
+import com.example.chess.ui.custom.chessboard.OnCellSizeChangedObservable.CellSizeChangedEventListener
 import com.example.chess.utils.changeSize
 import kotlinx.android.synthetic.main.chessboard_view.view.*
 import java.util.*
 
 
 class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
-    ConstraintLayout(context, attrs, defStyleAttr) {
+    ConstraintLayout(context, attrs, defStyleAttr), OnCellSizeChangedObservable {
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
@@ -42,6 +43,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     var applyMoveHandler: ((move: MoveDTO) -> Unit)? = null
 
     private val legendOffset = resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt()
+    override var listeners: MutableList<CellSizeChangedEventListener> = mutableListOf()
 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_view, this, true)
@@ -236,6 +238,8 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             for (child in legendLeft.children + legendRight.children) {
                 child.changeSize(legendOffset, cellSize)
             }
+
+            notify(cellSize)
         }
     }
 }

@@ -36,6 +36,8 @@ class ChessboardActivity : BaseActivity() {
         val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
         userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
 
+        chessboardView.subscribe(chessboardConstructorBar)
+
         chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->
             networkService.gameApi.getAvailableMoves(userId, game.id, rowIndex, columnIndex)
                 .enqueue {
@@ -49,7 +51,10 @@ class ChessboardActivity : BaseActivity() {
                     chessboardView.applyStateChanges(it.body()!!)
                     //TODO: game.position++
                     if (game.mode == GameMode.SINGLE) {
-                        chessboardView.setSide(chessboardView.getState()?.side?.reverse(), SINGLE_MOVE_AUTO_ROTATION_ENABLED)
+                        chessboardView.setSide(
+                            chessboardView.getState()?.side?.reverse(),
+                            SINGLE_MOVE_AUTO_ROTATION_ENABLED
+                        )
                     }
                 }
         }

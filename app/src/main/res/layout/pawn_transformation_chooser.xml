@@ -23,7 +23,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="50"
 
-                android:background="@drawable/border"
+                android:background="@drawable/border_black_almost"
                 android:padding="1dp">
 
             <ImageView
@@ -40,7 +40,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="50"
 
-                android:background="@drawable/border"
+                android:background="@drawable/border_black_almost"
                 android:padding="1dp">
             <ImageView
                     android:id="@+id/chooserRookButton"
@@ -67,7 +67,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="50"
 
-                android:background="@drawable/border"
+                android:background="@drawable/border_black_almost"
                 android:padding="1dp">
 
             <ImageView
@@ -84,7 +84,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="50"
 
-                android:background="@drawable/border"
+                android:background="@drawable/border_black_almost"
                 android:padding="1dp">
             <ImageView
                     android:id="@+id/chooserKnightButton"
