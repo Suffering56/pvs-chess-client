@@ -3,7 +3,6 @@ package com.example.chess.ui.custom.chessboard
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TableLayout
@@ -20,30 +19,34 @@ class ChessboardConstructorBar(context: Context?, attrs: AttributeSet?) : TableL
 
     constructor(context: Context) : this(context, null)
 
-    private val cellComponentsList: List<View>
-    private val items get() = cellComponentsList.stream().filter { it is ImageView }.map { it as ImageView }
+    private val cellContainers: List<FrameLayout>
+    private val imageItems: List<ImageView>
 
     var itemClickListener: ((img: ImageView, stateChanged: Boolean) -> Unit)? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_constructor_bar, this, true)
 
-        cellComponentsList = barTable.children.asStream()
+        cellContainers = barTable.children.asStream()
             .map { it as TableRow }
             .flatMap { it.children.asStream() }
             .map { it as FrameLayout }
-            .flatMap { it.children.asStream() }
             .toList()
 
-        items.forEach { img ->
-            img.setOnClickListener { onItemClick(img) }
-        }
+        imageItems = cellContainers.stream()
+            .flatMap { it.children.asStream() }
+            .filter { it is ImageView }
+            .map { it as ImageView }
+            .peek { img ->
+                img.setOnClickListener { onItemClick(img) }
+            }
+            .toList()
     }
 
 
     private fun onItemClick(item: ImageView) {
         val alreadySelected = item.background != null
-        items.forEach { it.background = null }
+        imageItems.forEach { it.background = null }
 
         if (!alreadySelected) {
             item.setBackgroundResource(R.drawable.cell_available_attack)
@@ -53,6 +56,6 @@ class ChessboardConstructorBar(context: Context?, attrs: AttributeSet?) : TableL
     }
 
     override fun onCellSizeChanged(cellSize: Int) {
-        cellComponentsList.forEach { it.changeSize(cellSize) }
+        cellContainers.forEach { it.changeSize(cellSize) }
     }
 }
