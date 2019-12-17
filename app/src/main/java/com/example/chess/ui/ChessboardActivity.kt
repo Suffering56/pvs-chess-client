@@ -42,6 +42,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         gameId = game.id
         gameMode = game.mode
 
+        chessboardConstructorBar.visibility = View.INVISIBLE
         chessboardView.subscribe(chessboardConstructorBar)
         chessboardConstructorBar?.subscribe(this)
 
@@ -115,7 +116,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
      * Отложенное появление панели конструтора доски
      */
     override fun onCellSizeChanged(cellSize: Int) {
-        if (gameMode == GameMode.CONSTRUCTOR) {
+        if (gameMode == GameMode.PVP) {
             chessboardConstructorBar.visibility = View.VISIBLE
         }
     }

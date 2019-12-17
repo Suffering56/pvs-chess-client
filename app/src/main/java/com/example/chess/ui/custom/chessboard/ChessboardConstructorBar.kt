@@ -3,6 +3,7 @@ package com.example.chess.ui.custom.chessboard
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TableLayout
@@ -81,7 +82,7 @@ class ChessboardConstructorBar(
     override fun setVisibility(visibility: Int) {
         visibilityState.visibility = visibility
 
-        if (visibilityState.sizeDefined) {
+        if (visibilityState.sizeDefined || visibility != View.VISIBLE) {
             super.setVisibility(visibility)
         }
     }
