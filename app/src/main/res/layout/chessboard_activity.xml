@@ -20,6 +20,7 @@
 
     <com.example.chess.ui.custom.chessboard.ChessboardConstructorBar
             android:id="@+id/chessboardConstructorBar"
+            android:visibility="invisible"
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

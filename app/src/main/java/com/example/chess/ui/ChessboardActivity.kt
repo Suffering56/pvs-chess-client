@@ -1,6 +1,7 @@
 package com.example.chess.ui
 
 import android.os.Bundle
+import android.view.View
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.example.chess.R
@@ -9,12 +10,13 @@ import com.example.chess.shared.dto.GameDTO
 import com.example.chess.shared.enums.GameMode
 import com.example.chess.shared.enums.Side
 import com.example.chess.ui.custom.chessboard.ChessboardViewState
+import com.example.chess.ui.custom.chessboard.OnCellSizeChangedObservable.CellSizeChangedEventListener
 import com.example.chess.utils.enqueue
 import kotlinx.android.synthetic.main.chessboard_activity.*
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
-
-class ChessboardActivity : BaseActivity() {
+class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
 
     companion object {
         private const val CHESSBOARD_STATE = "CHESSBOARD_STATE"
@@ -23,8 +25,10 @@ class ChessboardActivity : BaseActivity() {
 
     @Inject
     lateinit var networkService: INetworkService
-    lateinit var game: GameDTO
-    lateinit var userId: String
+
+    private lateinit var userId: String
+    private var gameId: Long by Delegates.notNull()
+    private lateinit var gameMode: GameMode
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,11 +36,14 @@ class ChessboardActivity : BaseActivity() {
         activityComponent.inject(this)
         ButterKnife.bind(this)
 
-        game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
+        val game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
         val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
         userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
+        gameId = game.id
+        gameMode = game.mode
 
         chessboardView.subscribe(chessboardConstructorBar)
+        chessboardConstructorBar?.subscribe(this)
 
         chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->
             networkService.gameApi.getAvailableMoves(userId, game.id, rowIndex, columnIndex)
@@ -48,8 +55,10 @@ class ChessboardActivity : BaseActivity() {
         chessboardView.applyMoveHandler = { move ->
             networkService.gameApi.applyMove(userId, game.id, move)
                 .enqueue {
-                    chessboardView.applyStateChanges(it.body()!!)
-                    //TODO: game.position++
+                    val changes = it.body()!!
+                    chessboardView.applyStateChanges(changes)
+                    //TODO: game.position = changes.position
+
                     if (game.mode == GameMode.SINGLE) {
                         chessboardView.setSide(
                             chessboardView.getState()?.side?.reverse(),
@@ -86,19 +95,28 @@ class ChessboardActivity : BaseActivity() {
     @OnClick(R.id.rotateButton)
     fun rotateChessboard() {
         //TODO: нужен safeCheck, который не будет крашить приложение
-        check(game.mode == GameMode.PVP) { "rotation is available only in PVP mode. actual mode: ${game.mode}" }
+        check(gameMode == GameMode.PVP) { "rotation is available only in PVP mode. actual mode: $gameMode" }
         chessboardView.getState()!!.side?.let { chessboardView.setSide(it.reverse(), true) }
     }
 
     @OnClick(R.id.rollbackButton)
     fun rollback() {
         Thread {
-            networkService.gameApi.rollback(userId, game.id, 1)
+            networkService.gameApi.rollback(userId, gameId, 1)
                 .enqueue { response ->
                     response.body()?.let {
                         chessboardView.resetTo(it)
                     }
                 }
         }.start()
+    }
+
+    /**
+     * Отложенное появление панели конструтора доски
+     */
+    override fun onCellSizeChanged(cellSize: Int) {
+        if (gameMode == GameMode.CONSTRUCTOR) {
+            chessboardConstructorBar.visibility = View.VISIBLE
+        }
     }
 }
