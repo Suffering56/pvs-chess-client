@@ -28,7 +28,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/pawn_white"/>
+                        android:src="@drawable/pawn_white"
+                        android:tag="PAWN_WHITE"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -42,7 +43,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/knight_white"/>
+                        android:src="@drawable/knight_white"
+                        android:tag="KNIGHT_WHITE"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -57,7 +59,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/bishop_white"/>
+                        android:src="@drawable/bishop_white"
+                        android:tag="BISHOP_WHITE"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -71,7 +74,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/rook_white"/>
+                        android:src="@drawable/rook_white"
+                        android:tag="ROOK_WHITE"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -86,7 +90,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/queen_white"/>
+                        android:src="@drawable/queen_white"
+                        android:tag="QUEEN_WHITE"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -100,7 +105,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/king_white"/>
+                        android:src="@drawable/king_white"
+                        android:tag="KING_WHITE"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -114,7 +120,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/hand"/>
+                        android:src="@drawable/move2"
+                        android:tag="ACTION_MOVE"/>
             </FrameLayout>
         </TableRow>
         <TableRow android:layout_width="match_parent"
@@ -131,7 +138,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/pawn_black"/>
+                        android:src="@drawable/pawn_black"
+                        android:tag="PAWN_BLACK"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -146,7 +154,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/knight_black"/>
+                        android:src="@drawable/knight_black"
+                        android:tag="KNIGHT_BLACK"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -160,7 +169,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/bishop_black"/>
+                        android:src="@drawable/bishop_black"
+                        android:tag="BISHOP_BLACK"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -175,7 +185,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/rook_black"/>
+                        android:src="@drawable/rook_black"
+                        android:tag="ROOK_BLACK"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -189,7 +200,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/queen_black"/>
+                        android:src="@drawable/queen_black"
+                        android:tag="QUEEN_BLACK"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -204,7 +216,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/king_black"/>
+                        android:src="@drawable/king_black"
+                        android:tag="KING_BLACK"/>
             </FrameLayout>
             <FrameLayout
                     android:layout_width="50dp"
@@ -218,7 +231,8 @@
                 <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:src="@drawable/trash"/>
+                        android:src="@drawable/trash"
+                        android:tag="ACTION_REMOVE"/>
             </FrameLayout>
         </TableRow>
 
