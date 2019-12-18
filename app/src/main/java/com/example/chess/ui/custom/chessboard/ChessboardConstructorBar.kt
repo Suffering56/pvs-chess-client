@@ -27,7 +27,7 @@ class ChessboardConstructorBar(
 
     private val cellContainers: List<FrameLayout>
     private val imageItems: List<ImageView>
-    var itemClickListener: ((action: String) -> Unit)? = null
+    var itemClickListener: ((event: ConstructorEvent) -> Unit)? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_constructor_bar, this, true)
@@ -49,15 +49,10 @@ class ChessboardConstructorBar(
     }
 
     private fun onItemClick(item: ImageView) {
-        val alreadySelected = isItemSelected(item)
-        cleanSelection()
-
-        val action = selectItem(
-            if (alreadySelected) moveItem
-            else item
-        )
-
-        itemClickListener?.invoke(action)
+        resetSelection()
+        val action = selectItem(item)
+        itemClickListener?.invoke(ConstructorEvent(action)) //TODO: нужно добавить callback, чтобы ресетать селекшн,
+                                                            // для REMOVE можно рекурсивно вызывать onItemClick по callback-у
     }
 
     private fun isItemSelected(item: ImageView) = item.background != null
@@ -67,7 +62,7 @@ class ChessboardConstructorBar(
         return item.tag.toString()
     }
 
-    private fun cleanSelection() {
+    private fun resetSelection() {
         imageItems.forEach { it.background = null }
     }
 

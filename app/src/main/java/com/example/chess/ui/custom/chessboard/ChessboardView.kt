@@ -9,7 +9,6 @@ import android.widget.TableRow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import com.example.chess.R
-import com.example.chess.shared.Constants.EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION
 import com.example.chess.shared.dto.ChangesDTO
 import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.dto.MoveDTO
@@ -41,6 +40,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     var availablePieceClickHandler: ((rowIndex: Int, columnIndex: Int) -> Unit)? = null
     var applyMoveHandler: ((move: MoveDTO) -> Unit)? = null
+    var onConstructedBoardPieceClickListener: ((piece: Piece?) -> Unit)? = null
 
     private val legendOffset = resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt()
     override var listeners: MutableList<CellSizeChangedEventListener> = mutableListOf()
@@ -78,15 +78,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         repaint()
     }
 
-    fun initForConstructor(chessboard: ChessboardDTO, side: Side?) {
-        check(!isInitialized())
-
-        this.state = ChessboardViewState(chessboard, true, EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION)
-        setSide(side, true)
-
-        repaint()
-    }
-
     fun init(chessboard: ChessboardDTO, side: Side?) {
         check(!isInitialized())
 
@@ -106,7 +97,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     }
 
     fun updateConstructorPiece(piece: Piece) {
-        state.constructorPiece = piece
+        state.constructorState!!.piece = piece
     }
 
     fun updateAvailablePoints(availablePoints: Set<PointDTO>) {
@@ -135,8 +126,18 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         val selectedCell = cellsMatrices[rowIndex][columnIndex]
         val selectedPoint = selectedCell.point
 
-        if (state.isConstructorEnabled) {
-            state.executeConstructorMove(selectedPoint)
+        state.constructorState?.let {
+            if (it.piece != null || it.removeNext) {
+                state.executeConstructorMove(selectedPoint)
+            } else {
+                it.movePointFrom = selectedPoint
+                it.piece = selectedCell.piece
+                onConstructedBoardPieceClickListener?.invoke(selectedCell.piece)
+
+                it.piece?.let {
+                    state.selectedPoint = selectedPoint
+                }
+            }
             return
         }
 
@@ -241,5 +242,19 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
             notify(cellSize)
         }
+    }
+
+    fun enableConstructorMode() {
+        state.enableConstructor()
+    }
+
+    fun disableConstructorMode(position: Int) {
+        state.disableConstructor(position)
+    }
+
+    fun updateConstructorState(event: ConstructorEvent) {
+        requireNotNull(state.constructorState) {
+            "constructor state is null, please enable constructor mode first"
+        }.update(event)
     }
 }

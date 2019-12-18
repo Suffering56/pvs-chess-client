@@ -6,6 +6,7 @@ import butterknife.ButterKnife
 import butterknife.OnClick
 import com.example.chess.R
 import com.example.chess.network.INetworkService
+import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.dto.GameDTO
 import com.example.chess.shared.enums.GameMode
 import com.example.chess.shared.enums.Side
@@ -30,6 +31,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     private var gameId: Long by Delegates.notNull()
     private lateinit var gameMode: GameMode
 
+    @Suppress("PLUGIN_WARNING") //TODO: ругается что chessboardConstructorBar может быть null, но при этом не ругается на остальные компоненты
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.chessboard_activity)
@@ -40,27 +42,32 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
         userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
         gameId = game.id
-        gameMode = game.mode
+//        gameMode = game.mode
+        gameMode = GameMode.CONSTRUCTOR
 
         chessboardConstructorBar.visibility = View.INVISIBLE
         chessboardView.subscribe(chessboardConstructorBar)
-        chessboardConstructorBar?.subscribe(this)
+        chessboardConstructorBar.subscribe(this)
+
+        chessboardConstructorBar.itemClickListener = { event ->
+            chessboardView.updateConstructorState(event)
+        }
 
         chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->
-            networkService.gameApi.getAvailableMoves(userId, game.id, rowIndex, columnIndex)
+            networkService.gameApi.getAvailableMoves(userId, gameId, rowIndex, columnIndex)
                 .enqueue {
                     chessboardView.updateAvailablePoints(it.body()!!)
                 }
         }
 
         chessboardView.applyMoveHandler = { move ->
-            networkService.gameApi.applyMove(userId, game.id, move)
+            networkService.gameApi.applyMove(userId, gameId, move)
                 .enqueue {
                     val changes = it.body()!!
                     chessboardView.applyStateChanges(changes)
                     //TODO: game.position = changes.position
 
-                    if (game.mode == GameMode.SINGLE) {
+                    if (gameMode == GameMode.SINGLE) {
                         chessboardView.setSide(
                             chessboardView.getState()?.side?.reverse(),
                             SINGLE_MOVE_AUTO_ROTATION_ENABLED
@@ -69,16 +76,34 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
                 }
         }
 
-        Thread {
-            networkService.gameApi.getChessboard(userId, game.id)
-                .enqueue { response ->
-                    response.body()?.let {
-                        if (!chessboardView.isInitialized()) {
-                            chessboardView.init(it, side)
+        initChessboardContent(gameId, side)
+    }
+
+    private fun initChessboardContent(gameId: Long, side: Side?) {
+        if (gameMode != GameMode.CONSTRUCTOR) {
+            Thread {
+                networkService.gameApi.getChessboard(userId, gameId)
+                    .enqueue { response ->
+                        response.body()?.let {
+                            if (!chessboardView.isInitialized()) {
+                                chessboardView.init(it, side)
+                            }
                         }
                     }
-                }
-        }.start()
+            }.start()
+        } else {
+            chessboardView.init(
+                ChessboardDTO(
+                    0,
+                    ChessboardDTO.createEmptyMatrix(),
+                    null,
+                    null
+                ),
+                side
+            )
+
+            chessboardView.enableConstructorMode()
+        }
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle?) {
@@ -116,7 +141,8 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
      * Отложенное появление панели конструтора доски
      */
     override fun onCellSizeChanged(cellSize: Int) {
-        if (gameMode == GameMode.PVP) {
+        if (gameMode == GameMode.CONSTRUCTOR) {
+            @Suppress("PLUGIN_WARNING")
             chessboardConstructorBar.visibility = View.VISIBLE
         }
     }

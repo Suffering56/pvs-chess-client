@@ -1,8 +1,10 @@
 package com.example.chess.ui.custom.chessboard
 
+import com.example.chess.shared.Constants.EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION
 import com.example.chess.shared.dto.*
 import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
+import java.util.*
 
 /**
  * @author v.peschaniy
@@ -11,7 +13,6 @@ import com.example.chess.shared.enums.Side
 
 class ChessboardViewState(
     chessboard: ChessboardDTO? = null,
-    var isConstructorEnabled: Boolean = false,
     initialPosition: Int = 0
 ) : IUnmodifiableChessboardViewState {
     lateinit var chessboard: ChessboardDTO
@@ -27,7 +28,8 @@ class ChessboardViewState(
     var availablePoints: Set<PointDTO>? = null
     var previousMove: MoveDTO? = null
     var checkedPoint: PointDTO? = null
-    var constructorPiece: Piece? = null
+
+    var constructorState: ConstrictorState? = null
 
     private fun updateChessboard(chessboard: ChessboardDTO) {
         this.chessboard = chessboard
@@ -45,15 +47,25 @@ class ChessboardViewState(
     }
 
     internal fun executeConstructorMove(pointTo: PointDTO) {
+        val state = requireNotNull(constructorState) {
+            "try to execute constructor move, but constructor state is null"
+        }
 
+        val pointFrom = state.movePointFrom
+
+        pointFrom?.let {
+            // перемещение фигуры в рамках доски. очищаем pointFrom
+            chessboard.matrix[it.row][it.col] = CellDTO(pointTo, null)
+        }
+
+        // выставляем запомненную фигуру на доску (это или перемещаемая или новая)
+        // или удаляем ту что была на указанной точке в случае (removeNext == true)
         chessboard.matrix[pointTo.row][pointTo.col] = CellDTO(
             pointTo,
-            constructorPiece
+            if (state.removeNext) null else state.piece
         )
 
-        position++
-        constructorPiece = null
-
+        state.reset()
         cleanHighlighting()
     }
 
@@ -99,4 +111,45 @@ class ChessboardViewState(
     private fun nextTurnSide() = if (position % 2 == 0) Side.WHITE else Side.BLACK
 
     private fun isCutMove(move: MoveDTO) = move.from == move.to
+
+    internal fun enableConstructor() {
+        constructorState = ConstrictorState()
+    }
+
+    internal fun disableConstructor(position: Int) {
+        constructorState = null
+        this.position = position
+    }
+
+    inner class ConstrictorState {
+        var piece: Piece? = null
+        var movePointFrom: PointDTO? = null
+        var removeNext: Boolean = false
+
+        internal fun reset() {
+            piece = null
+            movePointFrom = null
+            removeNext = false
+        }
+
+        internal fun update(event: ConstructorEvent) {
+            removeNext = event.removeNext
+            piece = event.selectedPiece
+        }
+
+        //TODO: перетащить в сервер. здесь этот код не нужен. позицию просто рефрешнем
+        fun calculateConstructorPosition(): Int {
+            val piecesCount = Arrays.stream(this@ChessboardViewState.chessboard.matrix)
+                .flatMap { Arrays.stream(it) }
+                .filter { it.piece != null }
+                .count()
+                .toInt()
+
+            return EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION + piecesCount + getSidePositionOffset(piecesCount)
+        }
+
+        private fun getSidePositionOffset(piecesCount: Int): Int {
+            TODO("NYI: move to server") //EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION возможно 32
+        }
+    }
 }
