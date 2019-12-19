@@ -1,8 +1,10 @@
 package com.example.chess.ui.custom.chessboard
 
+import android.content.ClipData
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -44,15 +46,26 @@ class ChessboardConstructorBar(
             .map { it as ImageView }
             .peek { img ->
                 img.setOnClickListener { onItemClick(img) }
+                img.setOnTouchListener { view, event -> onStartDragAndDrop(view as ImageView, event); true }
             }
             .toList()
+    }
+
+    private fun onStartDragAndDrop(img: ImageView, event: MotionEvent) {
+        if (ConstructorEvent.isPieceAction(img.tag.toString())) {
+            img.startDragAndDrop(
+                ClipData.newPlainText("label", "text"),
+                DragShadowBuilder(img),
+                null,
+                0
+            )
+        }
     }
 
     private fun onItemClick(item: ImageView) {
         resetSelection()
         val action = selectItem(item)
         itemClickListener?.invoke(ConstructorEvent(action)) //TODO: нужно добавить callback, чтобы ресетать селекшн,
-                                                            // для REMOVE можно рекурсивно вызывать onItemClick по callback-у
     }
 
     private fun isItemSelected(item: ImageView) = item.background != null

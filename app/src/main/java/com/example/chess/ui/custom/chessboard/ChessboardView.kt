@@ -2,6 +2,7 @@ package com.example.chess.ui.custom.chessboard
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.DragEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
@@ -62,6 +63,8 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
                 }
 
                 tableRow.addView(img)
+
+                img.setOnDragListener { source, event -> onDrag(source, event) }
 
                 return@cell cellContainer
             }
@@ -256,5 +259,14 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         requireNotNull(state.constructorState) {
             "constructor state is null, please enable constructor mode first"
         }.update(event)
+    }
+
+    private fun onDrag(source: View?, event: DragEvent?): Boolean {
+        event?.clipData?.description?.let {
+            println("it.label = ${it.label}")
+            println("event.clipData.getItemAt(0).text = ${event.clipData.getItemAt(0).text}")
+        }
+
+        return true
     }
 }

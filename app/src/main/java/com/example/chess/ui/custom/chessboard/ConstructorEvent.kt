@@ -13,15 +13,15 @@ class ConstructorEvent(action: String) {
     var removeNext: Boolean
 
     init {
-        selectedPiece = try {
-            Piece.valueOf(action)
-        } catch (e: Exception) {
-            null
-        }
+        selectedPiece = if (isPieceAction(action)) Piece.valueOf(action) else null
+
         removeNext = action == ACTION_REMOVE
     }
 
     companion object {
         const val ACTION_REMOVE = "ACTION_REMOVE"
+        private const val ACTION_MOVE = "ACTION_MOVE"
+
+        fun isPieceAction(action: String) = action != ACTION_REMOVE && action != ACTION_MOVE
     }
 }
