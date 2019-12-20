@@ -64,7 +64,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
                 tableRow.addView(img)
 
-                img.setOnDragListener { source, event -> onDrag(source, event) }
+                img.setOnDragListener { source, event -> onDrag(source as ImageView, event) }
 
                 return@cell cellContainer
             }
@@ -255,16 +255,18 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         state.disableConstructor(position)
     }
 
-    fun updateConstructorState(event: ConstructorEvent) {
+    fun updateConstructorState(action: String) {
         requireNotNull(state.constructorState) {
             "constructor state is null, please enable constructor mode first"
-        }.update(event)
+        }.update(action)
     }
 
-    private fun onDrag(source: View?, event: DragEvent?): Boolean {
-        event?.clipData?.description?.let {
-            println("it.label = ${it.label}")
-            println("event.clipData.getItemAt(0).text = ${event.clipData.getItemAt(0).text}")
+    private fun onDrag(img: ImageView, event: DragEvent?): Boolean {
+        state.constructorState?.let { state ->
+            event?.clipData?.getItemAt(0)?.text?.let { action ->
+                state.update(action.toString())
+                img.callOnClick()
+            }
         }
 
         return true

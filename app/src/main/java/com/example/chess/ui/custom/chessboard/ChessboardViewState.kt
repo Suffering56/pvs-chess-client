@@ -132,7 +132,8 @@ class ChessboardViewState(
             removeNext = false
         }
 
-        internal fun update(event: ConstructorEvent) {
+        internal fun update(action: String) {
+            val event = ConstructorEvent(action)
             removeNext = event.removeNext
             piece = event.selectedPiece
         }

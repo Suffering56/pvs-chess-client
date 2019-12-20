@@ -29,7 +29,7 @@ class ChessboardConstructorBar(
 
     private val cellContainers: List<FrameLayout>
     private val imageItems: List<ImageView>
-    var itemClickListener: ((event: ConstructorEvent) -> Unit)? = null
+    var itemClickListener: ((action: String) -> Unit)? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_constructor_bar, this, true)
@@ -45,27 +45,32 @@ class ChessboardConstructorBar(
             .filter { it is ImageView }
             .map { it as ImageView }
             .peek { img ->
-                img.setOnClickListener { onItemClick(img) }
-                img.setOnTouchListener { view, event -> onStartDragAndDrop(view as ImageView, event); true }
+                img.setOnTouchListener { view, event -> onItemTouch(view as ImageView, event); true }
             }
             .toList()
     }
 
-    private fun onStartDragAndDrop(img: ImageView, event: MotionEvent) {
-        if (ConstructorEvent.isPieceAction(img.tag.toString())) {
-            img.startDragAndDrop(
-                ClipData.newPlainText("label", "text"),
-                DragShadowBuilder(img),
-                null,
-                0
-            )
+    private fun onItemTouch(img: ImageView, event: MotionEvent) {
+        if (event.action == MotionEvent.ACTION_MOVE) {
+            val action = img.tag.toString()
+
+            if (ConstructorEvent.isPieceAction(action)) {
+                img.startDragAndDrop(
+                    ClipData.newPlainText("constructor_bar_event", action),
+                    DragShadowBuilder(img),
+                    null,
+                    0
+                )
+            }
         }
+
+        onItemClick(img)
     }
 
     private fun onItemClick(item: ImageView) {
         resetSelection()
         val action = selectItem(item)
-        itemClickListener?.invoke(ConstructorEvent(action)) //TODO: нужно добавить callback, чтобы ресетать селекшн,
+        itemClickListener?.invoke(action) //TODO: нужно добавить callback, чтобы ресетать селекшн,
     }
 
     private fun isItemSelected(item: ImageView) = item.background != null
