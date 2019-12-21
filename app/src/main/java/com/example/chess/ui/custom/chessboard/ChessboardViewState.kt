@@ -65,7 +65,10 @@ class ChessboardViewState(
             if (state.removeNext) null else state.piece
         )
 
-        state.reset()
+        state.movePointFrom?.let {
+            state.piece = null
+        }
+        state.movePointFrom = null
         cleanHighlighting()
     }
 
@@ -126,14 +129,7 @@ class ChessboardViewState(
         var movePointFrom: PointDTO? = null
         var removeNext: Boolean = false
 
-        internal fun reset() {
-            piece = null
-            movePointFrom = null
-            removeNext = false
-        }
-
-        internal fun update(action: String) {
-            val event = ConstructorEvent(action)
+        internal fun update(event: ConstructorEvent) {
             removeNext = event.removeNext
             piece = event.selectedPiece
         }

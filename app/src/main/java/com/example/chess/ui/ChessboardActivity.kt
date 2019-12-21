@@ -49,8 +49,8 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         chessboardView.subscribe(chessboardConstructorBar)
         chessboardConstructorBar.subscribe(this)
 
-        chessboardConstructorBar.itemClickListener = { action ->
-            chessboardView.updateConstructorState(action)
+        chessboardConstructorBar.itemClickListener = { event ->
+            chessboardView.updateConstructorState(event)
         }
 
         chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->

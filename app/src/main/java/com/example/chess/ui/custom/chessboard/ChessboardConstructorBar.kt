@@ -2,6 +2,7 @@ package com.example.chess.ui.custom.chessboard
 
 import android.content.ClipData
 import android.content.Context
+import android.content.Intent
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -28,8 +29,8 @@ class ChessboardConstructorBar(
     override var listeners: MutableList<OnCellSizeChangedObservable.CellSizeChangedEventListener> = mutableListOf()
 
     private val cellContainers: List<FrameLayout>
-    private val imageItems: List<ImageView>
-    var itemClickListener: ((action: String) -> Unit)? = null
+    private val items: List<ImageItem>
+    var itemClickListener: ((event: ConstructorEvent) -> Unit)? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_constructor_bar, this, true)
@@ -40,48 +41,74 @@ class ChessboardConstructorBar(
             .map { it as FrameLayout }
             .toList()
 
-        imageItems = cellContainers.stream()
-            .flatMap { it.children.asStream() }
-            .filter { it is ImageView }
-            .map { it as ImageView }
-            .peek { img ->
-                img.setOnTouchListener { view, event -> onItemTouch(view as ImageView, event); true }
+
+        items = cellContainers.stream()
+            .map {
+                val backView = it.getChildAt(1)
+                require(backView.tag == null) { "incorrect backView selected" }
+                val img = it.getChildAt(2)
+                require(img is ImageView) { "incorrect imageView selected" }
+
+                ImageItem(backView, img)
             }
             .toList()
     }
 
-    private fun onItemTouch(img: ImageView, event: MotionEvent) {
-        if (event.action == MotionEvent.ACTION_MOVE) {
-            val action = img.tag.toString()
+    inner class ImageItem(
+        private val back: View,
+        private val img: ImageView
+    ) {
+        private val action: String = img.tag.toString()
 
+        init {
+            @Suppress("ClickableViewAccessibility")
+            img.setOnTouchListener { _, event ->
+                if (event.action == MotionEvent.ACTION_MOVE) {
+                    tryStartDragAndDrop()
+                } else if (event.action == MotionEvent.ACTION_DOWN) {
+                    onClick()
+                }
+                true
+            }
+        }
+
+        private fun onClick() {
+            resetSelection()
+            select()
+            val event = ConstructorEvent(action)
+            itemClickListener?.invoke(event)
+        }
+
+        private fun tryStartDragAndDrop() {
             if (ConstructorEvent.isPieceAction(action)) {
+                val intent = Intent()
+                intent.putExtra(
+                    ConstructorEvent.NAME,
+                    ConstructorEvent(action)
+                )
+
+                val shadowBuilder = DragShadowBuilder(img)
+
                 img.startDragAndDrop(
-                    ClipData.newPlainText("constructor_bar_event", action),
-                    DragShadowBuilder(img),
+                    ClipData.newIntent("constructor_bar_event", intent),
+                    shadowBuilder,
                     null,
                     0
                 )
             }
         }
 
-        onItemClick(img)
-    }
+        private fun select() {
+            back.setBackgroundResource(R.drawable.cell_available_attack)
+        }
 
-    private fun onItemClick(item: ImageView) {
-        resetSelection()
-        val action = selectItem(item)
-        itemClickListener?.invoke(action) //TODO: нужно добавить callback, чтобы ресетать селекшн,
-    }
-
-    private fun isItemSelected(item: ImageView) = item.background != null
-
-    private fun selectItem(item: ImageView): String {
-        item.setBackgroundResource(R.drawable.cell_available_attack)
-        return item.tag.toString()
+        fun unselect() {
+            back.background = null
+        }
     }
 
     private fun resetSelection() {
-        imageItems.forEach { it.background = null }
+        items.forEach { it.unselect() }
     }
 
     override fun onCellSizeChanged(cellSize: Int) {

@@ -255,18 +255,18 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         state.disableConstructor(position)
     }
 
-    fun updateConstructorState(action: String) {
+    fun updateConstructorState(event: ConstructorEvent) {
         requireNotNull(state.constructorState) {
             "constructor state is null, please enable constructor mode first"
-        }.update(action)
+        }.update(event)
     }
 
-    private fun onDrag(img: ImageView, event: DragEvent?): Boolean {
-        state.constructorState?.let { state ->
-            event?.clipData?.getItemAt(0)?.text?.let { action ->
-                state.update(action.toString())
-                img.callOnClick()
-            }
+    private fun onDrag(img: ImageView, dragEvent: DragEvent?): Boolean {
+        dragEvent?.clipData?.getItemAt(0)?.intent?.let { intent ->
+            val event = intent.getSerializableExtra(ConstructorEvent.NAME) as ConstructorEvent
+            updateConstructorState(event)
+
+            img.callOnClick()
         }
 
         return true
