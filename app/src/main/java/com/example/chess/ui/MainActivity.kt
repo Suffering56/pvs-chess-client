@@ -57,16 +57,6 @@ class MainActivity : BaseActivity() {
 
     @OnClick(R.id.newGameButton)
     fun createNewGame() {
-//        game = GameDTO(
-//            1,
-//            0,
-//            GameMode.SINGLE,
-//            Side.WHITE,
-//            emptyList()
-//        )
-//        showNextStep()
-//        return
-
         progressBar.visibility = View.VISIBLE
 
         Thread {
@@ -93,13 +83,14 @@ class MainActivity : BaseActivity() {
         }.start()   //first service call is too long
     }
 
-    @OnClick(value = [R.id.singleModeButton, R.id.pvpModeButton, R.id.aiModeButton])
+    @OnClick(value = [R.id.singleModeButton, R.id.pvpModeButton, R.id.aiModeButton,  R.id.constructorModeButton])
     fun selectGameModeClick(view: View) {
 
         val gameMode = when (view.id) {
             R.id.singleModeButton -> GameMode.SINGLE
             R.id.pvpModeButton -> GameMode.PVP
             R.id.aiModeButton -> GameMode.AI
+            R.id.constructorModeButton -> GameMode.CONSTRUCTOR
             else -> throw UnsupportedOperationException()
         }
 

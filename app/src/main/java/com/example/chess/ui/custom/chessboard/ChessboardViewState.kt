@@ -1,10 +1,8 @@
 package com.example.chess.ui.custom.chessboard
 
-import com.example.chess.shared.Constants.EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION
 import com.example.chess.shared.dto.*
 import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
-import java.util.*
 
 /**
  * @author v.peschaniy
@@ -15,7 +13,8 @@ class ChessboardViewState(
     chessboard: ChessboardDTO? = null,
     initialPosition: Int = 0
 ) : IUnmodifiableChessboardViewState {
-    lateinit var chessboard: ChessboardDTO
+
+    override lateinit var chessboard: ChessboardDTO
 
     init {
         chessboard?.let { updateChessboard(it) }
@@ -73,7 +72,7 @@ class ChessboardViewState(
     }
 
     internal fun applyChanges(changes: ChangesDTO) {
-        check(changes.position == position + 1) { "incorrect changes version" }
+        check(changes.position == position + 1) { "incorrect changes version, expected: ${position + 1}, actual: ${changes.position}" }
 
         position = changes.position
         previousMove = changes.lastMove
@@ -119,9 +118,8 @@ class ChessboardViewState(
         constructorState = ConstrictorState()
     }
 
-    internal fun disableConstructor(position: Int) {
+    internal fun disableConstructor() {
         constructorState = null
-        this.position = position
     }
 
     inner class ConstrictorState {
@@ -132,21 +130,6 @@ class ChessboardViewState(
         internal fun update(event: ConstructorEvent) {
             removeNext = event.removeNext
             piece = event.selectedPiece
-        }
-
-        //TODO: перетащить в сервер. здесь этот код не нужен. позицию просто рефрешнем
-        fun calculateConstructorPosition(): Int {
-            val piecesCount = Arrays.stream(this@ChessboardViewState.chessboard.matrix)
-                .flatMap { Arrays.stream(it) }
-                .filter { it.piece != null }
-                .count()
-                .toInt()
-
-            return EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION + piecesCount + getSidePositionOffset(piecesCount)
-        }
-
-        private fun getSidePositionOffset(piecesCount: Int): Int {
-            TODO("NYI: move to server") //EXPECTED_FIRST_CONSTRUCTED_HISTORY_ITEM_POSITION возможно 32
         }
     }
 }

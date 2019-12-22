@@ -1,5 +1,6 @@
 package com.example.chess.ui.custom.chessboard
 
+import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.enums.Side
 import java.io.Serializable
 
@@ -10,4 +11,5 @@ import java.io.Serializable
 interface IUnmodifiableChessboardViewState : Serializable {
     val position: Int
     val side: Side?
+    val chessboard: ChessboardDTO
 }

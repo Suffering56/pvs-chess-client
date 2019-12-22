@@ -32,8 +32,8 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         private const val BOARD_SIZE = 8
     }
 
-    private val cellsMatrices: Array<Array<CellImageWrapper>>
-    private val cellsStream get() = Arrays.stream(cellsMatrices).flatMap { Arrays.stream(it) }
+    private val cellsMatrix: Array<Array<CellImageWrapper>>
+    private val cellsStream get() = Arrays.stream(cellsMatrix).flatMap { Arrays.stream(it) }
 
     private lateinit var state: ChessboardViewState
     fun isInitialized() = ::state.isInitialized
@@ -49,7 +49,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     init {
         LayoutInflater.from(context).inflate(R.layout.chessboard_view, this, true)
 
-        cellsMatrices = Array(BOARD_SIZE) row@{ rowIndex ->
+        cellsMatrix = Array(BOARD_SIZE) row@{ rowIndex ->
             val tableRow = TableRow(context)
 
             val imagesArray = Array(BOARD_SIZE) cell@{ columnIndex ->
@@ -75,7 +75,13 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     }
 
     fun resetTo(chessboard: ChessboardDTO) {
-        this.state = ChessboardViewState(chessboard)
+        requireNotNull(state.constructorState) {
+            "constructor state is null, please enable constructor mode first"
+        }
+
+        state.disableConstructor()
+
+        this.state = ChessboardViewState(chessboard, chessboard.position)
         setSide(Side.ofPosition(chessboard.position), false)
 
         repaint()
@@ -97,10 +103,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         setSide(state.side, true)
 
         repaint()
-    }
-
-    fun updateConstructorPiece(piece: Piece) {
-        state.constructorState!!.piece = piece
     }
 
     fun updateAvailablePoints(availablePoints: Set<PointDTO>) {
@@ -126,7 +128,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     }
 
     private fun onCellClick(rowIndex: Int, columnIndex: Int) {
-        val selectedCell = cellsMatrices[rowIndex][columnIndex]
+        val selectedCell = cellsMatrix[rowIndex][columnIndex]
         val selectedPoint = selectedCell.point
 
         state.constructorState?.let {
@@ -204,7 +206,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     }
 
     private fun getCell(point: PointDTO): CellImageWrapper {
-        return cellsMatrices[point.row][point.col]
+        return cellsMatrix[point.row][point.col]
     }
 
     /**
@@ -231,7 +233,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         this.post {
             chessboardProgressBar.changeSize(cellSize * 2)
 
-            Arrays.stream(cellsMatrices)
+            Arrays.stream(cellsMatrix)
                 .flatMap { Arrays.stream(it) }
                 .forEach { it.img.changeSize(cellSize) }
 
@@ -251,8 +253,8 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         state.enableConstructor()
     }
 
-    fun disableConstructorMode(position: Int) {
-        state.disableConstructor(position)
+    fun disableConstructorMode() {
+        state.disableConstructor()
     }
 
     fun updateConstructorState(event: ConstructorEvent) {

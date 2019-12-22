@@ -41,4 +41,5 @@
     <string name="legend_chessboard_r1" translatable="false">r1</string>
     <string name="legend_chessboard_r0" translatable="false">r0</string>
 
+    <string name="chessboard_bar_disable_constructor" translatable="false">Continue game</string>
 </resources>

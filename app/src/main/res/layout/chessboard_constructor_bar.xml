@@ -291,7 +291,9 @@
 
     </TableLayout>
     <Button
-            android:text="Button"
+            android:text="@string/chessboard_bar_disable_constructor"
+            android:id="@+id/stateSwitchButton"
+
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:id="@+id/button"/>
+            android:layout_height="wrap_content"/>
 </LinearLayout>

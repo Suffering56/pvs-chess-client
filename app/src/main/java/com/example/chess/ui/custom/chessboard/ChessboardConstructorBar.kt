@@ -31,16 +31,16 @@ class ChessboardConstructorBar(
     private val cellContainers: List<FrameLayout>
     private val items: List<ImageItem>
     var itemClickListener: ((event: ConstructorEvent) -> Unit)? = null
+    var onDisableConstructorListener: (() -> Unit)? = null
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.chessboard_constructor_bar, this, true)
+        LayoutInflater.from(context!!).inflate(R.layout.chessboard_constructor_bar, this, true)
 
         cellContainers = barTable.children.asStream()
             .map { it as TableRow }
             .flatMap { it.children.asStream() }
             .map { it as FrameLayout }
             .toList()
-
 
         items = cellContainers.stream()
             .map {
@@ -52,6 +52,10 @@ class ChessboardConstructorBar(
                 ImageItem(backView, img)
             }
             .toList()
+
+        stateSwitchButton.setOnClickListener {
+            onDisableConstructorListener?.invoke()
+        }
     }
 
     inner class ImageItem(

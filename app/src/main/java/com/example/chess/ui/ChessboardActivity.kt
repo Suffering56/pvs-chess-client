@@ -42,8 +42,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
         userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
         gameId = game.id
-//        gameMode = game.mode
-        gameMode = GameMode.CONSTRUCTOR
+        gameMode = game.mode
 
         chessboardConstructorBar.visibility = View.INVISIBLE
         chessboardView.subscribe(chessboardConstructorBar)
@@ -51,6 +50,27 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
 
         chessboardConstructorBar.itemClickListener = { event ->
             chessboardView.updateConstructorState(event)
+        }
+
+        chessboardConstructorBar.onDisableConstructorListener = {
+            val chessboard = chessboardView.getState()!!.chessboard
+
+            networkService.gameApi.continueConstructorGame(userId, gameId, chessboard)
+                .enqueue {
+                    val changes = it.body()!!
+
+                    val newChessboard = ChessboardDTO(
+                        changes.position,
+                        chessboard.matrix,
+                        null,
+                        changes.checkedPoint
+                    )
+
+                    chessboardView.resetTo(newChessboard)
+                    chessboardView.disableConstructorMode()
+
+                    chessboardConstructorBar.visibility = View.INVISIBLE
+                }
         }
 
         chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->
@@ -65,9 +85,8 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
                 .enqueue {
                     val changes = it.body()!!
                     chessboardView.applyStateChanges(changes)
-                    //TODO: game.position = changes.position
 
-                    if (gameMode == GameMode.SINGLE) {
+                    if (gameMode == GameMode.SINGLE || gameMode == GameMode.CONSTRUCTOR) {
                         chessboardView.setSide(
                             chessboardView.getState()?.side?.reverse(),
                             SINGLE_MOVE_AUTO_ROTATION_ENABLED
