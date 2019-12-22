@@ -82,7 +82,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         state.disableConstructor()
 
         this.state = ChessboardViewState(chessboard, chessboard.position)
-        setSide(Side.ofPosition(chessboard.position), false)
+        setSide(Side.nextTurnSide(chessboard.position), false)
 
         repaint()
     }
@@ -90,7 +90,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     fun init(chessboard: ChessboardDTO, side: Side?) {
         check(!isInitialized())
 
-        this.state = ChessboardViewState(chessboard)
+        this.state = ChessboardViewState(chessboard, chessboard.position)
         setSide(side, true)
 
         repaint()

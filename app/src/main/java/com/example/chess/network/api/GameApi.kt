@@ -45,11 +45,4 @@ interface GameApi {
         @Query("gameId") gameId: Long,
         @Query("positionsOffset") positionsOffset: Int
     ): Call<ChessboardDTO>
-
-    @POST("game/constructor/continue")
-    fun continueConstructorGame(
-        @Query("userId") userId: String,
-        @Query("gameId") gameId: Long,
-        @Body chessboard: ChessboardDTO
-    ): Call<ChangesDTO>
 }

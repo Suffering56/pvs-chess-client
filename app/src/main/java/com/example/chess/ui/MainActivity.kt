@@ -1,16 +1,15 @@
 package com.example.chess.ui
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.provider.Settings
-import android.provider.Settings.Secure.getString
 import android.view.View
 import butterknife.ButterKnife
 import butterknife.OnClick
 import butterknife.OnTextChanged
+import com.example.chess.App
+import com.example.chess.GameState
 import com.example.chess.R
+import com.example.chess.getUserId
 import com.example.chess.network.INetworkService
 import com.example.chess.shared.dto.GameDTO
 import com.example.chess.shared.enums.GameMode
@@ -26,24 +25,18 @@ import javax.inject.Inject
  */
 class MainActivity : BaseActivity() {
 
-    companion object {
-        const val GAME = "game"
-        const val SIDE = "side"
-        const val USER_ID = "userId"
-    }
-
     @Inject
     lateinit var networkService: INetworkService
 
-    private lateinit var game: GameDTO
+    private lateinit var game: GameState
 
-    @SuppressLint("HardwareIds")
+    private val userId get() = getUserId(applicationContext)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         activityComponent.inject(this)
         ButterKnife.bind(this)
-        //TODO: надо как-то победить долгий первый вызов ретрофита
         showNextStep()
     }
 
@@ -51,75 +44,90 @@ class MainActivity : BaseActivity() {
         super.onResume()
         showMainLayout()
         if (::game.isInitialized) {
-            continueGameIdText.setText(game.id.toString())
+            game.id?.let {
+                continueGameIdText.setText(it.toString())
+            }
         }
     }
 
     @OnClick(R.id.newGameButton)
     fun createNewGame() {
-        progressBar.visibility = View.VISIBLE
-
-        Thread {
-            networkService.initApi.createGame()
-                .enqueue {
-                    progressBar.visibility = View.INVISIBLE
-                    game = it.body()!!
-                    showNextStep()
-                }
-        }.start()    //first service call is too long
+        game = GameState(userId, false)
+        showNextStep()
     }
 
-    @OnClick(R.id.continueGameButton)
-    fun continueGame() {
+    @OnClick(R.id.newConstructorGameButton)
+    fun createConstructorGame() {
+        game = GameState(userId, true)
+        showNextStep()
+    }
+
+    @OnClick(R.id.joinGameButton)
+    fun joinGame() {
         progressBar.visibility = View.VISIBLE
 
         Thread {
             networkService.initApi.getGame(userId, continueGameIdText.getTextAsLong())
                 .enqueue {
                     progressBar.visibility = View.INVISIBLE
-                    game = it.body()!!
+                    game = GameState(userId, it.body()!!)
                     showNextStep()
                 }
-        }.start()   //first service call is too long
+        }.start()
     }
 
-    @OnClick(value = [R.id.singleModeButton, R.id.pvpModeButton, R.id.aiModeButton,  R.id.constructorModeButton])
+    @OnClick(value = [R.id.singleModeButton, R.id.pvpModeButton, R.id.aiModeButton])
     fun selectGameModeClick(view: View) {
-
-        val gameMode = when (view.id) {
+        game.mode = when (view.id) {
             R.id.singleModeButton -> GameMode.SINGLE
             R.id.pvpModeButton -> GameMode.PVP
             R.id.aiModeButton -> GameMode.AI
-            R.id.constructorModeButton -> GameMode.CONSTRUCTOR
             else -> throw UnsupportedOperationException()
         }
-
-        networkService.initApi.setGameMode(userId, game.id, gameMode)
-            .enqueue {
-                game = it.body()!!
-                showNextStep()
-            }
+        showNextStep()
     }
 
     @OnClick(value = [R.id.whiteSideButton, R.id.blackSideButton])
     fun selectSideButton(view: View) {
-
         val side = when (view.id) {
             R.id.whiteSideButton -> Side.WHITE
             R.id.blackSideButton -> Side.BLACK
             else -> throw UnsupportedOperationException()
         }
+        if (game.isConstructor) {
+            game.side = side
+            showNextStep()
+            return
+        }
 
-        networkService.initApi.setSide(userId, game.id, side)
-            .enqueue {
-                game = it.body()!!
-                showNextStep()
-            }
+        if (game.isNew) {
+            networkService.initApi.createGame(userId, game.mode, side)
+                .enqueue {
+                    val serverGame = it.body()!!
+                    checkSide(serverGame, side)
+                    game.side = side
+                    game.id = serverGame.id
+                    showNextStep()
+                }
+        } else {
+            networkService.initApi.setSide(userId, game.id!!, side)
+                .enqueue {
+                    checkSide(it.body()!!, side)
+                    game.side = side
+                    showNextStep()
+                }
+        }
+    }
+
+    private fun checkSide(serverGame: GameDTO, side: Side) {
+        require(serverGame.side == side) {
+            "server side: ${serverGame.side} and client side: $side are not equals"
+        }
     }
 
     @OnTextChanged(R.id.continueGameIdText)
     fun onGameIdChanged(actualText: CharSequence) {
-        continueGameButton.isEnabled = actualText.isNotEmpty()
+        joinGameButton.isEnabled = actualText.isNotEmpty()
     }
 
     private fun showNextStep() {
@@ -129,16 +137,18 @@ class MainActivity : BaseActivity() {
             if (game.mode == GameMode.UNSELECTED) {
                 showModeLayout()
             } else {
-                val side = game.side
+                if (game.side == null) {
+                    val freeSideSlots = game.getFreeSideSlots()
 
-                if (side == null) {
-                    if (game.freeSideSlots.isNotEmpty()) {
-                        showSideLayout()
+                    if (freeSideSlots.isEmpty()) {
+                        // isViewer
+                        showChessboardActivity()
                     } else {
-                        showChessboardActivity(null)    //isViewer
+                        showSideLayout(freeSideSlots)
                     }
                 } else {
-                    showChessboardActivity(side)
+                    // side already selected
+                    showChessboardActivity()
                 }
             }
         }
@@ -158,11 +168,11 @@ class MainActivity : BaseActivity() {
         chooseModeLayout.visibility = View.VISIBLE
     }
 
-    private fun showSideLayout() {
+    private fun showSideLayout(freeSideSlots: Iterable<Side>) {
         whiteSideButton.isEnabled = false
         blackSideButton.isEnabled = false
 
-        game.freeSideSlots.forEach {
+        freeSideSlots.forEach {
             when (it) {
                 Side.WHITE -> whiteSideButton.isEnabled = true
                 Side.BLACK -> blackSideButton.isEnabled = true
@@ -175,17 +185,9 @@ class MainActivity : BaseActivity() {
         chooseSideLayout.visibility = View.VISIBLE
     }
 
-    private fun showChessboardActivity(side: Side?) {
+    private fun showChessboardActivity() {
         val intent = Intent(this, ChessboardActivity::class.java)
-        intent.putExtra(GAME, game)
-        intent.putExtra(SIDE, side)
-        intent.putExtra(USER_ID, userId)
+        intent.putExtra(App.EXTRAS_GAME, game)
         startActivity(intent)
     }
-
-    private val userId get() = getUserId(applicationContext)
 }
-
-@SuppressLint("HardwareIds")
-fun getUserId(context: Context): String = getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-

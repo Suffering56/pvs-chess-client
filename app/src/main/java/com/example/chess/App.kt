@@ -1,6 +1,9 @@
 package com.example.chess
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
+import android.provider.Settings
 import com.example.chess.di.component.ApplicationComponent
 import com.example.chess.di.component.DaggerApplicationComponent
 import com.example.chess.di.module.ApplicationModule
@@ -22,6 +25,10 @@ class App : Application() {
             .build()
         applicationComponent.context = this
     }
+
+    companion object {
+        const val EXTRAS_GAME = "EXTRAS_GAME"
+    }
 }
 
 fun printErr(msg: String, e: Throwable? = null) {
@@ -33,5 +40,5 @@ fun printErr(e: Throwable) {
     printErr("failure.message = ${e.message}", e)
 }
 
-
-
+@SuppressLint("HardwareIds")
+fun getUserId(context: Context): String = Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)

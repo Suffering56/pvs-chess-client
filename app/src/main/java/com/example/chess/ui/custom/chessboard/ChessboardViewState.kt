@@ -11,7 +11,7 @@ import com.example.chess.shared.enums.Side
 
 class ChessboardViewState(
     chessboard: ChessboardDTO? = null,
-    initialPosition: Int = 0
+    initialPosition: Int
 ) : IUnmodifiableChessboardViewState {
 
     override lateinit var chessboard: ChessboardDTO
@@ -108,9 +108,7 @@ class ChessboardViewState(
 
     internal fun isSelfPiece(selectedPiece: Piece?) = side == selectedPiece?.side
 
-    internal fun isSelfTurn() = side == nextTurnSide()
-
-    private fun nextTurnSide() = if (position % 2 == 0) Side.WHITE else Side.BLACK
+    internal fun isSelfTurn() = side == Side.nextTurnSide(position)
 
     private fun isCutMove(move: MoveDTO) = move.from == move.to
 

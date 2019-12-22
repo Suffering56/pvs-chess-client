@@ -1,13 +1,15 @@
 package com.example.chess.ui
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import butterknife.ButterKnife
 import butterknife.OnClick
+import com.example.chess.App
+import com.example.chess.GameState
 import com.example.chess.R
 import com.example.chess.network.INetworkService
 import com.example.chess.shared.dto.ChessboardDTO
-import com.example.chess.shared.dto.GameDTO
 import com.example.chess.shared.enums.GameMode
 import com.example.chess.shared.enums.Side
 import com.example.chess.ui.custom.chessboard.ChessboardViewState
@@ -27,10 +29,14 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     @Inject
     lateinit var networkService: INetworkService
 
-    private lateinit var userId: String
-    private var gameId: Long by Delegates.notNull()
-    private lateinit var gameMode: GameMode
+    private var game: GameState by Delegates.notNull()
 
+    private val userId: String get() = game.userId
+    private val gameId: Long get() = game.id!!
+    private val gameMode: GameMode get() = game.mode
+    private val side: Side get() = game.side!!
+
+    @SuppressLint("SetTextI18n")
     @Suppress("PLUGIN_WARNING") //TODO: ругается что chessboardConstructorBar может быть null, но при этом не ругается на остальные компоненты
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,11 +44,13 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         activityComponent.inject(this)
         ButterKnife.bind(this)
 
-        val game = intent.getSerializableExtra(MainActivity.GAME) as GameDTO
-        val side = intent.getSerializableExtra(MainActivity.SIDE) as Side?
-        userId = intent.getSerializableExtra(MainActivity.USER_ID) as String
-        gameId = game.id
-        gameMode = game.mode
+        game = intent.getSerializableExtra(App.EXTRAS_GAME) as GameState
+
+        if (!game.isConstructor) {
+            gameIdView.text = "gameId: $gameId"
+        } else {
+            gameIdView.text = "gameId: ???"
+        }
 
         chessboardConstructorBar.visibility = View.INVISIBLE
         chessboardView.subscribe(chessboardConstructorBar)
@@ -55,21 +63,25 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         chessboardConstructorBar.onDisableConstructorListener = {
             val chessboard = chessboardView.getState()!!.chessboard
 
-            networkService.gameApi.continueConstructorGame(userId, gameId, chessboard)
+            networkService.initApi.createConstructorGame(userId, gameMode, side, chessboard)
                 .enqueue {
-                    val changes = it.body()!!
+                    val constructorGame = it.body()!!
+                    //TODO: constructorGame.matrix == chessboard.matrix
+
+                    game.id = constructorGame.gameId
 
                     val newChessboard = ChessboardDTO(
-                        changes.position,
-                        chessboard.matrix,
+                        constructorGame.position,
+                        constructorGame.matrix,
                         null,
-                        changes.checkedPoint
+                        constructorGame.checkedPoint
                     )
 
                     chessboardView.resetTo(newChessboard)
                     chessboardView.disableConstructorMode()
 
                     chessboardConstructorBar.visibility = View.INVISIBLE
+                    gameIdView.text = "gameId: $gameId"
                 }
         }
 
@@ -86,26 +98,35 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
                     val changes = it.body()!!
                     chessboardView.applyStateChanges(changes)
 
-                    if (gameMode == GameMode.SINGLE || gameMode == GameMode.CONSTRUCTOR) {
-                        chessboardView.setSide(
-                            chessboardView.getState()?.side?.reverse(),
-                            SINGLE_MOVE_AUTO_ROTATION_ENABLED
-                        )
-                    }
+                    changeBoardSideForSingleMode()
                 }
         }
 
-        initChessboardContent(gameId, side)
+        initChessboardContent()
     }
 
-    private fun initChessboardContent(gameId: Long, side: Side?) {
-        if (gameMode != GameMode.CONSTRUCTOR) {
+    private fun changeBoardSideForSingleMode() {
+        if (gameMode == GameMode.SINGLE) {
+            chessboardView.setSide(
+                chessboardView.getState()?.side?.reverse(),
+                SINGLE_MOVE_AUTO_ROTATION_ENABLED
+            )
+        }
+    }
+
+    private fun initChessboardContent() {
+        if (!game.isConstructor) {
             Thread {
                 networkService.gameApi.getChessboard(userId, gameId)
                     .enqueue { response ->
                         response.body()?.let {
                             if (!chessboardView.isInitialized()) {
                                 chessboardView.init(it, side)
+
+                                if (side != Side.nextTurnSide(it.position)) {
+                                    // иначе не сможем сделать первый ход
+                                    changeBoardSideForSingleMode()
+                                }
                             }
                         }
                     }
@@ -160,7 +181,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
      * Отложенное появление панели конструтора доски
      */
     override fun onCellSizeChanged(cellSize: Int) {
-        if (gameMode == GameMode.CONSTRUCTOR) {
+        if (game.isConstructor) {
             @Suppress("PLUGIN_WARNING")
             chessboardConstructorBar.visibility = View.VISIBLE
         }

@@ -59,5 +59,13 @@
             android:layout_marginStart="8dp"
             android:layout_marginBottom="8dp"
     />
+    <TextView
+            android:text="gameId: 42"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/gameIdView" app:layout_constraintEnd_toStartOf="@+id/rotateButton"
+            android:layout_marginEnd="8dp" app:layout_constraintStart_toEndOf="@+id/rollbackButton"
+            android:layout_marginStart="8dp" android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/downloadChessboardButton" android:textSize="18sp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
