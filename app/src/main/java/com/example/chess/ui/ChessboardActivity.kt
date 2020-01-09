@@ -146,6 +146,11 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         }
     }
 
+    override fun onDestroy() {
+        chessboardView.onDestroy()
+        super.onDestroy()
+    }
+
     override fun onSaveInstanceState(savedInstanceState: Bundle?) {
         super.onSaveInstanceState(savedInstanceState)
         chessboardView.getState()?.let { savedInstanceState?.putSerializable(CHESSBOARD_STATE, it) }

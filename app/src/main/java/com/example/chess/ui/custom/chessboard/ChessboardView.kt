@@ -1,6 +1,7 @@
 package com.example.chess.ui.custom.chessboard
 
 import android.content.Context
+import android.os.AsyncTask
 import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.LayoutInflater
@@ -41,7 +42,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     var availablePieceClickHandler: ((rowIndex: Int, columnIndex: Int) -> Unit)? = null
     var applyMoveHandler: ((move: MoveDTO) -> Unit)? = null
-    var onConstructedBoardPieceClickListener: ((piece: Piece?) -> Unit)? = null
+    private var listenOpponentChangesTask: ListenOpponentChangesTask? = null
 
     private val legendOffset = resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt()
     override var listeners: MutableList<CellSizeChangedEventListener> = mutableListOf()
@@ -137,7 +138,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             } else {
                 it.movePointFrom = selectedPoint
                 it.piece = selectedCell.piece
-                onConstructedBoardPieceClickListener?.invoke(selectedCell.piece)
 
                 it.piece?.let {
                     state.selectedPoint = selectedPoint
@@ -272,5 +272,34 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
 
         return true
+    }
+
+    fun initOpponentChangesListener(interval: Long, opponentChangesListener: () -> ChangesDTO) {
+        tryStopOpponentChangesListening()
+
+        listenOpponentChangesTask = ListenOpponentChangesTask(interval) {
+            applyStateChanges(opponentChangesListener.invoke())
+        }
+    }
+
+    class ListenOpponentChangesTask(
+        private val interval: Long,
+        private val action: () -> Unit
+    ) : AsyncTask<Any, Any, Any>() {
+
+        override fun doInBackground(vararg params: Any?): Any {
+            while (true) {
+                Thread.sleep(interval)
+                action.invoke()
+            }
+        }
+    }
+
+    fun onDestroy() {
+        tryStopOpponentChangesListening()
+    }
+
+    private fun tryStopOpponentChangesListening() {
+        listenOpponentChangesTask?.cancel(true)
     }
 }
