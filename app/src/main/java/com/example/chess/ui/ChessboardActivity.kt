@@ -9,6 +9,7 @@ import com.example.chess.App
 import com.example.chess.GameState
 import com.example.chess.R
 import com.example.chess.network.INetworkService
+import com.example.chess.shared.dto.ChangesDTO
 import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.enums.GameMode
 import com.example.chess.shared.enums.Side
@@ -24,6 +25,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     companion object {
         private const val CHESSBOARD_STATE = "CHESSBOARD_STATE"
         private const val SINGLE_MOVE_AUTO_ROTATION_ENABLED = false
+        private const val LISTEN_OPPONENT_CHANGES_TICK_INTERVAL = 3000L
     }
 
     @Inject
@@ -35,6 +37,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     private val gameId: Long get() = game.id!!
     private val gameMode: GameMode get() = game.mode
     private val side: Side get() = game.side!!
+    private var position: Int = 0
 
     @SuppressLint("SetTextI18n")
     @Suppress("PLUGIN_WARNING") //TODO: ругается что chessboardConstructorBar может быть null, но при этом не ругается на остальные компоненты
@@ -69,6 +72,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
                     //TODO: constructorGame.matrix == chessboard.matrix
 
                     game.id = constructorGame.gameId
+                    position = constructorGame.position
 
                     val newChessboard = ChessboardDTO(
                         constructorGame.position,
@@ -96,23 +100,36 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
             networkService.gameApi.applyMove(userId, gameId, move)
                 .enqueue {
                     val changes = it.body()!!
-                    chessboardView.applyStateChanges(changes)
-
-                    changeBoardSideForSingleMode()
+                    applyMove(changes)
                 }
         }
 
         initChessboardContent()
 
-        chessboardView.initOpponentChangesListener(1000) {
-            //            chessboardView.applyStateChanges(changes)
-
-            println("tick:${System.currentTimeMillis()}")
-            null
+        if ((gameMode == GameMode.PVP || gameMode == GameMode.AI)) {
+            chessboardView.initOpponentChangesListener(LISTEN_OPPONENT_CHANGES_TICK_INTERVAL) {
+                if (game.id != null && side != Side.nextTurnSide(position)) {
+                    networkService.gameApi.listenOpponentChanges(userId, gameId, position)
+                        .enqueue { response ->
+                            val changes = response.body()!!
+                            if (!changes.isEmpty()) {
+                                applyMove(changes)
+                            }
+                        }
+                }
+            }
         }
     }
 
-    private fun changeBoardSideForSingleMode() {
+    private fun applyMove(changes: ChangesDTO) {
+        position = changes.position
+
+        chessboardView.applyStateChanges(changes)
+
+        rotateBoardSideForSingleMode()
+    }
+
+    private fun rotateBoardSideForSingleMode() {
         if (gameMode == GameMode.SINGLE) {
             chessboardView.setSide(
                 chessboardView.getState()?.side?.reverse(),
@@ -132,7 +149,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
 
                                 if (side != Side.nextTurnSide(it.position)) {
                                     // иначе не сможем сделать первый ход
-                                    changeBoardSideForSingleMode()
+                                    rotateBoardSideForSingleMode()
                                 }
                             }
                         }
@@ -153,6 +170,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         }
     }
 
+    //TODO: нужно добавить слушатель состояния activity в chessboardView
     override fun onResume() {
         super.onResume()
         chessboardView.onResume()

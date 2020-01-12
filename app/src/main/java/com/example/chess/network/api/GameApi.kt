@@ -45,4 +45,11 @@ interface GameApi {
         @Query("gameId") gameId: Long,
         @Query("positionsOffset") positionsOffset: Int
     ): Call<ChessboardDTO>
+
+    @GET("game/listen")
+    fun listenOpponentChanges(
+        @Query("userId") userId: String,
+        @Query("gameId") gameId: Long,
+        @Query("chessboardPosition") chessboardPosition: Int
+    ): Call<ChangesDTO?>
 }
