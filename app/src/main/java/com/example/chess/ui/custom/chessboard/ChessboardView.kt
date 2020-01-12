@@ -1,7 +1,6 @@
 package com.example.chess.ui.custom.chessboard
 
 import android.content.Context
-import android.os.AsyncTask
 import android.util.AttributeSet
 import android.view.DragEvent
 import android.view.LayoutInflater
@@ -18,10 +17,11 @@ import com.example.chess.shared.dto.PointDTO
 import com.example.chess.shared.enums.Piece
 import com.example.chess.shared.enums.Side
 import com.example.chess.ui.custom.chessboard.OnCellSizeChangedObservable.CellSizeChangedEventListener
+import com.example.chess.utils.AsyncTaskImpl
+import com.example.chess.utils.ReusableTimer
 import com.example.chess.utils.changeSize
 import kotlinx.android.synthetic.main.chessboard_view.view.*
 import java.util.*
-
 
 class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     ConstraintLayout(context, attrs, defStyleAttr), OnCellSizeChangedObservable {
@@ -42,7 +42,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
     var availablePieceClickHandler: ((rowIndex: Int, columnIndex: Int) -> Unit)? = null
     var applyMoveHandler: ((move: MoveDTO) -> Unit)? = null
-    private var listenOpponentChangesTask: ListenOpponentChangesTask? = null
+    private var listenOpponentChangesTask: ReusableTimer? = null
 
     private val legendOffset = resources.getDimension(R.dimen.chessboard_offset_for_legend).toInt()
     override var listeners: MutableList<CellSizeChangedEventListener> = mutableListOf()
@@ -274,32 +274,33 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         return true
     }
 
-    fun initOpponentChangesListener(interval: Long, opponentChangesListener: () -> ChangesDTO) {
-        tryStopOpponentChangesListening()
-
-        listenOpponentChangesTask = ListenOpponentChangesTask(interval) {
-            applyStateChanges(opponentChangesListener.invoke())
+    fun initOpponentChangesListener(interval: Long, requestOpponentChangesAction: () -> Unit) {
+        listenOpponentChangesTask = ReusableTimer(interval, interval) {
+            AsyncTaskImpl<Any, Any, Any> {
+                requestOpponentChangesAction.invoke()
+            }.execute()
         }
+
+        tryStartOpponentChangesListening()
     }
 
-    class ListenOpponentChangesTask(
-        private val interval: Long,
-        private val action: () -> Unit
-    ) : AsyncTask<Any, Any, Any>() {
+    private fun tryStopOpponentChangesListening() {
+        listenOpponentChangesTask?.stop()
+    }
 
-        override fun doInBackground(vararg params: Any?): Any {
-            while (true) {
-                Thread.sleep(interval)
-                action.invoke()
-            }
-        }
+    private fun tryStartOpponentChangesListening() {
+        listenOpponentChangesTask?.schedule()
+    }
+
+    fun onResume() {
+        tryStartOpponentChangesListening()
     }
 
     fun onDestroy() {
         tryStopOpponentChangesListening()
     }
 
-    private fun tryStopOpponentChangesListening() {
-        listenOpponentChangesTask?.cancel(true)
+    fun onPause() {
+        tryStopOpponentChangesListening()
     }
 }

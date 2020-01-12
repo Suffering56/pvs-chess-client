@@ -103,6 +103,13 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         }
 
         initChessboardContent()
+
+        chessboardView.initOpponentChangesListener(1000) {
+            //            chessboardView.applyStateChanges(changes)
+
+            println("tick:${System.currentTimeMillis()}")
+            null
+        }
     }
 
     private fun changeBoardSideForSingleMode() {
@@ -146,9 +153,19 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        chessboardView.onResume()
+    }
+
     override fun onDestroy() {
         chessboardView.onDestroy()
         super.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        chessboardView.onPause()
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle?) {
