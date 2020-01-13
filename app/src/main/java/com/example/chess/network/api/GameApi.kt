@@ -50,6 +50,6 @@ interface GameApi {
     fun listenOpponentChanges(
         @Query("userId") userId: String,
         @Query("gameId") gameId: Long,
-        @Query("chessboardPosition") chessboardPosition: Int
+        @Query("clientPosition") clientPosition: Int
     ): Call<ChangesDTO?>
 }

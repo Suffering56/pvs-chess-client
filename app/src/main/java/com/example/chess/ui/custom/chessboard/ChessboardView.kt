@@ -76,12 +76,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
     }
 
     fun resetTo(chessboard: ChessboardDTO) {
-        requireNotNull(state.constructorState) {
-            "constructor state is null, please enable constructor mode first"
-        }
-
-        state.disableConstructor()
-
         this.state = ChessboardViewState(chessboard, chessboard.position)
         setSide(Side.nextTurnSide(chessboard.position), false)
 

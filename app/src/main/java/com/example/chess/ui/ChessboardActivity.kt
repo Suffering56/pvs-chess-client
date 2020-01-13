@@ -211,6 +211,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
             networkService.gameApi.rollback(userId, gameId, 1)
                 .enqueue { response ->
                     response.body()?.let {
+                        position = it.position
                         chessboardView.resetTo(it)
                     }
                 }
