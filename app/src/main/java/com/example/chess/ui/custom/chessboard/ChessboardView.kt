@@ -75,10 +75,9 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
         }
     }
 
-    fun resetTo(chessboard: ChessboardDTO) {
+    fun resetTo(chessboard: ChessboardDTO, side: Side) {
         this.state = ChessboardViewState(chessboard, chessboard.position)
-        setSide(Side.nextTurnSide(chessboard.position), false)
-
+        setSide(side, false)
         repaint()
     }
 
@@ -170,7 +169,6 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
             state.selectedPoint = selectedPoint
         }
     }
-
 
     private fun repaint() {
         cellsStream.forEach {

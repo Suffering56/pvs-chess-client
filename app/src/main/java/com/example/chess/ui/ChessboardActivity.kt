@@ -37,7 +37,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     private val gameId: Long get() = game.id!!
     private val gameMode: GameMode get() = game.mode
     private val side: Side get() = game.side!!
-    private var currentPosition: Int = 0
+    private var position: Int = 0
 
     @SuppressLint("SetTextI18n")
     @Suppress("PLUGIN_WARNING") //TODO: ругается что chessboardConstructorBar может быть null, но при этом не ругается на остальные компоненты
@@ -72,7 +72,8 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
                     //TODO: constructorGame.matrix == chessboard.matrix
 
                     game.id = constructorGame.gameId
-                    currentPosition = constructorGame.position
+                    position = constructorGame.position
+                    game.side = Side.nextTurnSide(position)
 
                     val newChessboard = ChessboardDTO(
                         constructorGame.position,
@@ -81,7 +82,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
                         constructorGame.checkedPoint
                     )
 
-                    chessboardView.resetTo(newChessboard)
+                    chessboardView.resetTo(newChessboard, side)
                     chessboardView.disableConstructorMode()
 
                     chessboardConstructorBar.visibility = View.INVISIBLE
@@ -90,14 +91,14 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         }
 
         chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->
-            networkService.gameApi.getAvailableMoves(gameId, userId, currentPosition, rowIndex, columnIndex)
+            networkService.gameApi.getAvailableMoves(gameId, userId, position, rowIndex, columnIndex)
                 .enqueue {
                     chessboardView.updateAvailablePoints(it.body()!!)
                 }
         }
 
         chessboardView.applyMoveHandler = { move ->
-            networkService.gameApi.applyMove(gameId, userId, currentPosition, move)
+            networkService.gameApi.applyMove(gameId, userId, position, move)
                 .enqueue {
                     val changes = it.body()!!
                     applyMove(changes)
@@ -108,8 +109,8 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
 
         if ((gameMode == GameMode.PVP || gameMode == GameMode.AI)) {
             chessboardView.initOpponentChangesListener(LISTEN_OPPONENT_CHANGES_TICK_INTERVAL) {
-                if (game.id != null && side != Side.nextTurnSide(currentPosition)) {
-                    networkService.gameApi.listenOpponentChanges(gameId, userId, currentPosition)
+                if (game.id != null && side != Side.nextTurnSide(position)) {
+                    networkService.gameApi.listenOpponentChanges(gameId, userId, position)
                         .enqueue { response ->
                             val changes = response.body()!!
 //                            println("listen changes response: $changes")
@@ -123,7 +124,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     }
 
     private fun applyMove(changes: ChangesDTO) {
-        currentPosition = changes.position
+        position = changes.position
 
         chessboardView.applyStateChanges(changes)
 
@@ -209,11 +210,14 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     @OnClick(R.id.rollbackButton)
     fun rollback() {
         Thread {
-            networkService.gameApi.rollback(gameId, userId, currentPosition, 1)
+            networkService.gameApi.rollback(gameId, userId, position, 1)
                 .enqueue { response ->
                     response.body()?.let {
-                        currentPosition = it.position
-                        chessboardView.resetTo(it)
+                        position = it.position
+                        if (game.mode == GameMode.SINGLE) {
+                            game.side = Side.nextTurnSide(position)
+                        }
+                        chessboardView.resetTo(it, side)
                     }
                 }
         }.start()
