@@ -17,9 +17,6 @@ import retrofit2.http.Query
  */
 interface InitApi {
 
-    @GET("debug/version")
-    fun getVersion(): Call<String>
-
     @GET("init/new")
     fun createGame(
         @Query("userId") userId: String,
@@ -35,16 +32,16 @@ interface InitApi {
         @Body chessboard: ChessboardDTO
     ): Call<ConstructorGameDTO>
 
-    @GET("init/continue")
-    fun getGame(
+    @POST("init/register")
+    fun registerUser(
+        @Query("gameId") gameId: Long,
         @Query("userId") userId: String,
-        @Query("gameId") gameId: Long
+        @Query("side") side: Side
     ): Call<GameDTO>
 
-    @POST("init/side")
-    fun setSide(
-        @Query("userId") userId: String,
+    @GET("init/continue")
+    fun continueGame(
         @Query("gameId") gameId: Long,
-        @Query("side") side: Side
+        @Query("userId") userId: String
     ): Call<GameDTO>
 }

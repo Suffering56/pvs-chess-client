@@ -2,7 +2,6 @@ package com.example.chess.network
 
 import android.content.Context
 import com.example.chess.R
-import com.example.chess.network.api.DebugApi
 import com.example.chess.network.api.GameApi
 import com.example.chess.network.api.InitApi
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
@@ -22,7 +21,6 @@ class NetworkService @Inject constructor(context: Context) : INetworkService {
 
     private val retrofit: Retrofit
 
-    override val debugApi: DebugApi
     override val initApi: InitApi
     override val gameApi: GameApi
 
@@ -37,7 +35,6 @@ class NetworkService @Inject constructor(context: Context) : INetworkService {
     }
 
     init {
-        debugApi = retrofit.create(DebugApi::class.java)
         initApi = retrofit.create(InitApi::class.java)
         gameApi = retrofit.create(GameApi::class.java)
     }

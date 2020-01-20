@@ -37,7 +37,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     private val gameId: Long get() = game.id!!
     private val gameMode: GameMode get() = game.mode
     private val side: Side get() = game.side!!
-    private var position: Int = 0
+    private var currentPosition: Int = 0
 
     @SuppressLint("SetTextI18n")
     @Suppress("PLUGIN_WARNING") //TODO: ругается что chessboardConstructorBar может быть null, но при этом не ругается на остальные компоненты
@@ -72,7 +72,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
                     //TODO: constructorGame.matrix == chessboard.matrix
 
                     game.id = constructorGame.gameId
-                    position = constructorGame.position
+                    currentPosition = constructorGame.position
 
                     val newChessboard = ChessboardDTO(
                         constructorGame.position,
@@ -90,14 +90,14 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
         }
 
         chessboardView.availablePieceClickHandler = { rowIndex, columnIndex ->
-            networkService.gameApi.getAvailableMoves(userId, gameId, rowIndex, columnIndex)
+            networkService.gameApi.getAvailableMoves(gameId, userId, currentPosition, rowIndex, columnIndex)
                 .enqueue {
                     chessboardView.updateAvailablePoints(it.body()!!)
                 }
         }
 
         chessboardView.applyMoveHandler = { move ->
-            networkService.gameApi.applyMove(userId, gameId, move)
+            networkService.gameApi.applyMove(gameId, userId, currentPosition, move)
                 .enqueue {
                     val changes = it.body()!!
                     applyMove(changes)
@@ -108,10 +108,11 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
 
         if ((gameMode == GameMode.PVP || gameMode == GameMode.AI)) {
             chessboardView.initOpponentChangesListener(LISTEN_OPPONENT_CHANGES_TICK_INTERVAL) {
-                if (game.id != null && side != Side.nextTurnSide(position)) {
-                    networkService.gameApi.listenOpponentChanges(userId, gameId, position)
+                if (game.id != null && side != Side.nextTurnSide(currentPosition)) {
+                    networkService.gameApi.listenOpponentChanges(gameId, userId, currentPosition)
                         .enqueue { response ->
                             val changes = response.body()!!
+//                            println("listen changes response: $changes")
                             if (!changes.isEmpty()) {
                                 applyMove(changes)
                             }
@@ -122,7 +123,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     }
 
     private fun applyMove(changes: ChangesDTO) {
-        position = changes.position
+        currentPosition = changes.position
 
         chessboardView.applyStateChanges(changes)
 
@@ -141,7 +142,7 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     private fun initChessboardContent() {
         if (!game.isConstructor) {
             Thread {
-                networkService.gameApi.getChessboard(userId, gameId)
+                networkService.gameApi.getChessboard(gameId, userId)
                     .enqueue { response ->
                         response.body()?.let {
                             if (!chessboardView.isInitialized()) {
@@ -208,10 +209,10 @@ class ChessboardActivity : BaseActivity(), CellSizeChangedEventListener {
     @OnClick(R.id.rollbackButton)
     fun rollback() {
         Thread {
-            networkService.gameApi.rollback(userId, gameId, 1)
+            networkService.gameApi.rollback(gameId, userId, currentPosition, 1)
                 .enqueue { response ->
                     response.body()?.let {
-                        position = it.position
+                        currentPosition = it.position
                         chessboardView.resetTo(it)
                     }
                 }

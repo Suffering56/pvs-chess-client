@@ -1,6 +1,5 @@
 package com.example.chess.network
 
-import com.example.chess.network.api.DebugApi
 import com.example.chess.network.api.GameApi
 import com.example.chess.network.api.InitApi
 
@@ -9,7 +8,6 @@ import com.example.chess.network.api.InitApi
  *      Date: 31.07.2019
  */
 interface INetworkService {
-    val debugApi: DebugApi
     val initApi: InitApi
     val gameApi: GameApi
 }

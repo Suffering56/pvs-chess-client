@@ -19,37 +19,40 @@ interface GameApi {
 
     @GET("game/moves")
     fun getAvailableMoves(
-        @Query("userId") userId: String,
         @Query("gameId") gameId: Long,
+        @Query("userId") userId: String,
+        @Query("clientPosition") clientPosition: Int,
         @Query("rowIndex") rowIndex: Int,
         @Query("columnIndex") columnIndex: Int
     ): Call<Set<PointDTO>>
 
     @POST("game/move")
     fun applyMove(
-        @Query("userId") userId: String,
         @Query("gameId") gameId: Long,
+        @Query("userId") userId: String,
+        @Query("clientPosition") clientPosition: Int,
         @Body move: MoveDTO
     ): Call<ChangesDTO>
 
-    @GET("game/chessboard")
-    fun getChessboard(
-        @Query("userId") userId: String,
-        @Query("gameId") gameId: Long,
-        @Query("position") position: Int? = null
-    ): Call<ChessboardDTO>
-
     @POST("game/rollback")
     fun rollback(
-        @Query("userId") userId: String,
         @Query("gameId") gameId: Long,
+        @Query("userId") userId: String,
+        @Query("clientPosition") clientPosition: Int,
         @Query("positionsOffset") positionsOffset: Int
     ): Call<ChessboardDTO>
 
     @GET("game/listen")
     fun listenOpponentChanges(
-        @Query("userId") userId: String,
         @Query("gameId") gameId: Long,
+        @Query("userId") userId: String,
         @Query("clientPosition") clientPosition: Int
-    ): Call<ChangesDTO?>
+    ): Call<ChangesDTO>
+
+    @GET("game/chessboard")
+    fun getChessboard(
+        @Query("gameId") gameId: Long,
+        @Query("userId") userId: String,
+        @Query("position") position: Int? = null
+    ): Call<ChessboardDTO>
 }

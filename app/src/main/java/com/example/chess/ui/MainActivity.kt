@@ -67,7 +67,10 @@ class MainActivity : BaseActivity() {
         progressBar.visibility = View.VISIBLE
 
         Thread {
-            networkService.initApi.getGame(userId, continueGameIdText.getTextAsLong())
+            networkService.initApi.continueGame(
+                continueGameIdText.getTextAsLong(),
+                userId
+            )
                 .enqueue {
                     progressBar.visibility = View.INVISIBLE
                     game = GameState(userId, it.body()!!)
@@ -110,7 +113,7 @@ class MainActivity : BaseActivity() {
                     showNextStep()
                 }
         } else {
-            networkService.initApi.setSide(userId, game.id!!, side)
+            networkService.initApi.registerUser(game.id!!, userId, side)
                 .enqueue {
                     checkSide(it.body()!!, side)
                     game.side = side
