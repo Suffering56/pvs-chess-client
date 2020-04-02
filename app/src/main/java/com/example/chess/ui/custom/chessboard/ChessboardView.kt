@@ -15,6 +15,7 @@ import com.example.chess.shared.dto.ChessboardDTO
 import com.example.chess.shared.dto.MoveDTO
 import com.example.chess.shared.dto.PointDTO
 import com.example.chess.shared.enums.Piece
+import com.example.chess.shared.enums.PieceType
 import com.example.chess.shared.enums.Side
 import com.example.chess.ui.custom.chessboard.OnCellSizeChangedObservable.CellSizeChangedEventListener
 import com.example.chess.utils.AsyncTaskImpl
@@ -144,7 +145,7 @@ class ChessboardView(context: Context, attrs: AttributeSet?, defStyleAttr: Int) 
 
             if ((rowIndex == 0 || rowIndex == 7)) {
                 val pieceFrom = getCell(state.selectedPoint!!).piece!!
-                if (pieceFrom.isPawn()) {
+                if (pieceFrom.isTypeOf(PieceType.PAWN)) {
                     PawnTransformationChooser(context, pieceFrom.side) {
                         applyMoveHandler?.invoke(
                             MoveDTO(
